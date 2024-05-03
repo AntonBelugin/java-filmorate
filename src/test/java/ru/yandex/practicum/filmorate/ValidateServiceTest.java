@@ -18,7 +18,7 @@ public class ValidateServiceTest {
     private FilmController filmController;
     private UserController userController;
     private User user;
-    private Film film = new Film();
+    private Film film;
     private String failDescription = "12345678901234567890" +
             "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
             "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
