@@ -45,7 +45,6 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("==> GET /films");
         log.info("<== GET /films {}", films.values());
         return films.values();
     }

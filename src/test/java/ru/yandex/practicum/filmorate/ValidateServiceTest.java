@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
@@ -12,29 +13,53 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
-class ValidateServiceTest {
-    ValidateService validateService = new ValidateServiceImp();
-    FilmController filmController = new FilmController(validateService);
-    UserController userController = new UserController(validateService);
-    User user = new User();
-    Film film = new Film();
+public class ValidateServiceTest {
+    private ValidateService validateService;
+    private FilmController filmController;
+    private UserController userController;
+    private User user;
+    private Film film = new Film();
+    private String failDescription = "12345678901234567890" +
+            "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
+            "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
+            "123456789012345678901";
+    private String failDateBirthday = "2285-12-12";
+    private String failReleaseDate = "1785-12-12";
 
-    @Test
-    void testCreateUser() {
+    @BeforeEach
+    void beforeEach() {
+        validateService = new ValidateServiceImp();
+        filmController = new FilmController(validateService);
+        userController = new UserController(validateService);
+    }
+
+    void setUser() {
+        user = new User();
         user.setEmail("email@email.ru");
         user.setName("name");
         user.setLogin("login");
         user.setBirthday(LocalDate.parse("1985-12-12"));
+    }
+
+    void setFilm() {
+        film = new Film();
+        film.setName("name");
+        film.setDescription("description");
+        film.setReleaseDate(LocalDate.parse("1985-12-12"));
+        film.setDuration(600);
+    }
+
+    @Test
+    void testCreateUser() {
+        setUser();
         User newUser = userController.create(user);
         Assertions.assertEquals(user, newUser);
     }
 
     @Test
     void testCreateUserFailEmail() {
+        setUser();
         user.setEmail("email");
-        user.setName("name");
-        user.setLogin("login");
-        user.setBirthday(LocalDate.parse("1985-12-12"));
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             userController.create(user);
         });
@@ -49,10 +74,8 @@ class ValidateServiceTest {
 
     @Test
     void testCreateUserFailLogin() {
-        user.setEmail("email@email.ru");
-        user.setName("name");
+        setUser();
         user.setLogin(null);
-        user.setBirthday(LocalDate.parse("1985-12-12"));
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             userController.create(user);
         });
@@ -66,11 +89,9 @@ class ValidateServiceTest {
     }
 
     @Test
-    void testCreateUserFailDataBirthday() {
-        user.setEmail("email@email.ru");
-        user.setName("name");
-        user.setLogin("login");
-        user.setBirthday(LocalDate.parse("2285-12-12"));
+    void testCreateUserFailDateBirthday() {
+        setUser();
+        user.setBirthday(LocalDate.parse(failDateBirthday));
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             userController.create(user);
         });
@@ -80,20 +101,15 @@ class ValidateServiceTest {
 
     @Test
     void testCreateUserFailName() {
-        user.setEmail("email@email.ru");
+        setUser();
         user.setName(null);
-        user.setLogin("login");
-        user.setBirthday(LocalDate.parse("1985-12-12"));
         userController.create(user);
         Assertions.assertEquals("login", user.getName());
     }
 
     @Test
     void testUpdateUser() {
-        user.setEmail("email@email.ru");
-        user.setName("name");
-        user.setLogin("login");
-        user.setBirthday(LocalDate.parse("1985-12-12"));
+        setUser();
         User newUser = userController.create(user);
         newUser.setLogin("login2");
         User newUser2 = userController.update(newUser);
@@ -102,10 +118,7 @@ class ValidateServiceTest {
 
     @Test
     void testUpdateUserUserFailId() {
-        user.setEmail("email@email.ru");
-        user.setName("name");
-        user.setLogin("login");
-        user.setBirthday(LocalDate.parse("1985-12-12"));
+        setUser();
         userController.create(user);
 
         user.setId(2L);
@@ -113,7 +126,6 @@ class ValidateServiceTest {
             userController.update(user);
         });
         Assertions.assertEquals("Неверный Id", exception.getMessage());
-
 
         user.setId(null);
         ValidationException exception2 = Assertions.assertThrows(ValidationException.class, () -> {
@@ -125,20 +137,15 @@ class ValidateServiceTest {
 
     @Test
     void testCreateFilm() {
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
-        film.setDuration(600);
+        setFilm();
         Film newFilm = filmController.create(film);
         Assertions.assertEquals(film, newFilm);
     }
 
     @Test
     void testCreateFilmFailName() {
+        setFilm();
         film.setName(null);
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
-        film.setDuration(600);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             filmController.create(film);
         });
@@ -153,13 +160,8 @@ class ValidateServiceTest {
 
     @Test
     void testCreateFilmFailDescription() {
-        film.setName("name");
-        film.setDescription("12345678901234567890" +
-                "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
-                "12345678901234567890123456789012345678901234567890123456789012345678901234567890" +
-                "123456789012345678901");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
-        film.setDuration(600);
+        setFilm();
+        film.setDescription(failDescription);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             filmController.create(film);
         });
@@ -168,9 +170,8 @@ class ValidateServiceTest {
 
     @Test
     void testCreateFilmFailReleaseDate() {
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1785-12-12"));
+        setFilm();
+        film.setReleaseDate(LocalDate.parse(failReleaseDate));
         film.setDuration(600);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             filmController.create(film);
@@ -180,9 +181,7 @@ class ValidateServiceTest {
 
     @Test
     void testCreateFilmFailDuration() {
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
+        setFilm();
         film.setDuration(0);
         ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
             filmController.create(film);
@@ -192,10 +191,7 @@ class ValidateServiceTest {
 
     @Test
     void testUpdateFilm() {
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
-        film.setDuration(600);
+        setFilm();
         Film newFilm = filmController.create(film);
         newFilm.setDuration(700);
         Assertions.assertEquals(newFilm, filmController.update(newFilm));
@@ -203,10 +199,7 @@ class ValidateServiceTest {
 
     @Test
     void testUpdateFilmFailId() {
-        film.setName("name");
-        film.setDescription("description");
-        film.setReleaseDate(LocalDate.parse("1985-12-12"));
-        film.setDuration(600);
+        setFilm();
         filmController.create(film);
 
         film.setId(2L);
