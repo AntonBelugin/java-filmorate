@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.controller.ValidateServiceImp;
 @SpringBootApplication
 public class FilmorateApplication {
 	public static void main(String[] args) {
-		ValidateService validateService = new ValidateServiceImp();
+		//ValidateService validateService = new ValidateServiceImp();
 		SpringApplication.run(FilmorateApplication.class, args);
 	}
 

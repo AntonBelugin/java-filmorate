@@ -28,9 +28,9 @@ public class ValidateServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        validateService = new ValidateServiceImp();
-        filmController = new FilmController(validateService);
-        userController = new UserController(validateService);
+        //validateService = new ValidateServiceImp();
+        //filmController = new FilmController(validateService, );
+        //userController = new UserController(validateService);
     }
 
     void setUser() {

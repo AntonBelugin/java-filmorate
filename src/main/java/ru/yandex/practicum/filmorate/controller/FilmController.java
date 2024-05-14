@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,12 +15,15 @@ import java.util.Map;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private Map<Long, Film> films = new HashMap<>();
+    //private Map<Long, Film> films = new HashMap<>();
     private ValidateService validateService;
     private Long currentId = 0L;
+    private FilmStorage filmStorage;
 
-    public FilmController(ValidateService validateService) {
+    @Autowired
+    public FilmController(ValidateService validateService, FilmStorage filmStorage) {
         this.validateService = validateService;
+        this.filmStorage = filmStorage;
     }
 
     @PostMapping
@@ -26,7 +31,8 @@ public class FilmController {
         log.info("==> POST /films");
         validateService.validateFilm(film);
         film.setId(getNextId());
-        films.put(film.getId(), film);
+        //films.put(film.getId(), film);
+        filmStorage.addFilm(film);
         log.info("<== POST /films {}", film);
         return film;
     }
@@ -35,18 +41,18 @@ public class FilmController {
     public Film update(@RequestBody Film upFilm) {
         log.info("==> PUT /films");
         validateService.validateUpdateFilm(upFilm);
-        if (!films.containsKey(upFilm.getId())) {
+        if (!filmStorage.getFilms().containsKey(upFilm.getId())) {
             throw new ValidationException("Неверный Id");
         }
-        films.put(upFilm.getId(), upFilm);
+        filmStorage.updateFilm(upFilm);
         log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("<== GET /films {}", films.values());
-        return films.values();
+        log.info("<== GET /films {}", filmStorage.getAllFilms());
+        return filmStorage.getAllFilms();
     }
 
     private long getNextId() {
