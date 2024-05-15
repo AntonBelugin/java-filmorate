@@ -1,7 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ErrorResponse;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -20,7 +24,7 @@ public class UserController {
     private ValidateService validateService;
     private Long currentId = 0L;
     private UserStorage userStorage;
-
+    @Autowired
     public UserController(ValidateService validateService, UserStorage userStorage, UserService userService) {
         this.validateService = validateService;
         this.userStorage = userStorage;
@@ -68,13 +72,40 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public void findFriends(@PathVariable long id) {
-        userService.findFriends(id);
+    public Collection<User> findFriends(@PathVariable long id) {
+        return userService.findFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public void findCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        userService.findCommonFriends(id, otherId);
+    public Collection<User> findCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        return userService.findCommonFriends(id, otherId);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handle(final ValidationException e) {
+        return new ErrorResponse(
+                "Ошибка с параметрами",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handle(final NotFoundException e) {
+        return new ErrorResponse(
+                "Неправильный ввод данных",
+                e.getMessage()
+        );
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handle(final RuntimeException e) {
+        return new ErrorResponse(
+                "Внутренняя ошибка сервера",
+                e.getMessage()
+        );
     }
 
     private long getNextId() {
