@@ -14,17 +14,17 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public void addFilm(Film film) {
+    public void add(Film film) {
         films.put(film.getId(), film);
     }
 
     @Override
-    public void removeFilm(Film film) {
+    public void remove(Film film) {
         films.remove(film.getId());
     }
 
     @Override
-    public void updateFilm(Film upFilm) {
+    public void update(Film upFilm) {
         if (!films.containsKey(upFilm.getId())) {
             throw new ValidationException("Неверный Id");
         }
@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAll() {
         return films.values();
     }
 

@@ -32,7 +32,7 @@ public class FilmController {
         validateService.validateFilm(film);
         film.setId(getNextId());
         //films.put(film.getId(), film);
-        filmStorage.addFilm(film);
+        filmStorage.add(film);
         log.info("<== POST /films {}", film);
         return film;
     }
@@ -44,15 +44,15 @@ public class FilmController {
         if (!filmStorage.getFilms().containsKey(upFilm.getId())) {
             throw new ValidationException("Неверный Id");
         }
-        filmStorage.updateFilm(upFilm);
+        filmStorage.update(upFilm);
         log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("<== GET /films {}", filmStorage.getAllFilms());
-        return filmStorage.getAllFilms();
+        log.info("<== GET /films {}", filmStorage.getAll());
+        return filmStorage.getAll();
     }
 
     private long getNextId() {
