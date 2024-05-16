@@ -47,7 +47,7 @@ public class UserController {
         log.info("==> PUT /users");
         validateService.validateUpdateUser(upUser);
         if (!userStorage.getUsers().containsKey(upUser.getId())) {
-            throw new ValidationException("Неверный Id");
+            throw new NotFoundException("Неверный Id");
         }
         userStorage.update(upUser);
         log.info("<== PUT /users {}", upUser);

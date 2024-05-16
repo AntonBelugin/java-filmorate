@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -29,7 +30,6 @@ public class ValidateServiceImp implements ValidateService {
         if (upUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-
         validateUser(upUser);
     }
 

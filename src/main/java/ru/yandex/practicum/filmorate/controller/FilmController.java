@@ -55,6 +55,18 @@ public class FilmController {
         return filmStorage.getAll();
     }
 
+    @PutMapping
+    public void addLike(@RequestBody Film upFilm) {
+        log.info("==> PUT /films");
+        validateService.validateUpdateFilm(upFilm);
+        if (!filmStorage.getFilms().containsKey(upFilm.getId())) {
+            throw new ValidationException("Неверный Id");
+        }
+        filmStorage.update(upFilm);
+        log.info("<== PUT /films {}", upFilm);
+        return upFilm;
+    }
+
     private long getNextId() {
         return ++currentId;
     }

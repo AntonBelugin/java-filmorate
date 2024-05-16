@@ -53,8 +53,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Collection<User> findFriends(long userId) {
         List<User> friends = new ArrayList<>();
-        for (Long id : userFriendsIds.get(userId)) {
-            friends.add(users.get(id));
+        if (userFriendsIds.containsKey(userId)) {
+            for (Long id : userFriendsIds.get(userId)) {
+                friends.add(users.get(id));
+            }
         }
         return friends;
     }
@@ -71,7 +73,6 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return friends;
     }
-
 
     public Map<Long, User> getUsers() {
         return users;

@@ -12,8 +12,12 @@ import java.util.Collection;
 
 @Service
 public class UserService {
-    @Autowired
     private UserStorage userStorage;
+
+    @Autowired
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public void addFriends(long userId, long friendId) {
         if (!userStorage.getUsers().containsKey(userId)) {
