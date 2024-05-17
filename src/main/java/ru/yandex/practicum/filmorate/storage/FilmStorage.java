@@ -13,6 +13,12 @@ public interface FilmStorage {
 
     void update(Film film);
 
+    void addLike(long id, long userId);
+
+    void deleteLike(long id, long userId);
+
+    Collection<Film> mostLike(int count);
+
     Collection<Film> getAll();
 
     Map<Long, Film> getFilms();

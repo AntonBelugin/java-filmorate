@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
@@ -15,15 +17,17 @@ import java.util.Map;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
+    private FilmService filmService;
     //private Map<Long, Film> films = new HashMap<>();
     private ValidateService validateService;
     private Long currentId = 0L;
     private FilmStorage filmStorage;
 
     @Autowired
-    public FilmController(ValidateService validateService, FilmStorage filmStorage) {
+    public FilmController(ValidateService validateService, FilmStorage filmStorage, FilmService filmService) {
         this.validateService = validateService;
         this.filmStorage = filmStorage;
+        this.filmService = filmService;
     }
 
     @PostMapping
@@ -55,16 +59,22 @@ public class FilmController {
         return filmStorage.getAll();
     }
 
-    @PutMapping
-    public void addLike(@RequestBody Film upFilm) {
-        log.info("==> PUT /films");
-        validateService.validateUpdateFilm(upFilm);
-        if (!filmStorage.getFilms().containsKey(upFilm.getId())) {
-            throw new ValidationException("Неверный Id");
-        }
-        filmStorage.update(upFilm);
-        log.info("<== PUT /films {}", upFilm);
-        return upFilm;
+    @PutMapping("/films/{id}/like/{userId}")
+    public void addLike(@PathVariable long id,  @PathVariable long userId) {
+        //log.info("==> PUT /films");
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void deleteLike(@PathVariable long id,  @PathVariable long userId) {
+        //log.info("==> PUT /films");
+        filmService.deleteLike(id, userId);
+    }
+
+    @GetMapping("/films/popular?count={count}")
+    public Collection<Film> mostLike(@RequestParam(defaultValue = "10") int count) {
+        //log.info("==> PUT /films");
+        return filmService.mostLike(count);
     }
 
     private long getNextId() {
