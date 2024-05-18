@@ -12,18 +12,16 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
     private final UserService userService;
-    //private Map<Long, User> users = new HashMap<>();
-    private ValidateService validateService;
+    private final ValidateService validateService;
     private Long currentId = 0L;
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
+
     @Autowired
     public UserController(ValidateService validateService, UserStorage userStorage, UserService userService) {
         this.validateService = validateService;
@@ -63,21 +61,25 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id,  @PathVariable long friendId) {
+        log.info("==> PUT /users/{id}/friends/{friendId}");
         userService.addFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable long id,  @PathVariable long friendId) {
+        log.info("==> DELETE /users/{id}/friends/{friendId}");
         userService.deleteFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public Collection<User> findFriends(@PathVariable long id) {
+        log.info("==> GET /users/{id}/friends");
         return userService.findFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public Collection<User> findCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info("==> GET /users/{id}/friends/common/{otherId}");
         return userService.findCommonFriends(id, otherId);
     }
 

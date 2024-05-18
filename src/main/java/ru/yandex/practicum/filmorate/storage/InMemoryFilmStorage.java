@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,6 @@ import java.util.stream.Collectors;
 public class InMemoryFilmStorage implements FilmStorage {
     private Map<Long, Film> films = new HashMap<>();
     private HashMap<Long, Set<Long>> filmLikes = new HashMap<>();
-
 
     @Override
     public void add(Film film) {
@@ -50,28 +48,28 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> mostLike(int count) {
-        LinkedHashMap<Long, Integer> map = new LinkedHashMap<>();
+        Map<Long, Integer> map = new HashMap<>();
         filmLikes.forEach((key, value) -> map.put(key, value.size()));
-       /* LinkedHashMap<Long, Integer> sortedMap = new LinkedHashMap<>();
-        map.entrySet().stream().sorted(Map.Entry.comparingByValue())
-                .forEach((key) -> sortedMap.put(key, value));*/
 
-        Map<Long, Integer> sortedMap = map.entrySet()
-                .stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        Map<Long, Integer> sortedMap = map.entrySet().stream()
+                .sorted(Comparator.comparingInt(e -> -e.getValue()))
+                .collect(Collectors
+                        .toMap(Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (e1, e2) -> e1,
+                                LinkedHashMap::new));
+
+        List<Long> listId = new ArrayList<>();
+        sortedMap.forEach((key, value) -> listId.add(key));
 
         Collection<Film> result = new ArrayList<>();
-
-
-
-        return map;
-        filmLikes.entrySet().stream()
-                        .sorted(userLike )
-        filmLikes.get(id).remove(userId);
+        if (listId.size() <= count) {
+            count = listId.size();
+        }
+        for (int i = 0; i < count; i++) {
+                result.add(films.get(listId.get(i)));
+            }
+        return result;
     }
 
     public Map<Long, Film> getFilms() {

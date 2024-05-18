@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.util.Collection;
 
 @Service
@@ -28,7 +27,6 @@ public class FilmService {
             throw new NotFoundException("Неверный Id фильма");
         }
         filmStorage.addLike(id, userId);
-
     }
 
     public void deleteLike(long id, long userId) {
