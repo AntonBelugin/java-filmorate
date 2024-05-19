@@ -22,4 +22,6 @@ public interface FilmStorage {
     Collection<Film> getAll();
 
     Map<Long, Film> getFilms();
+
+    public void testFilm(long filmId);
 }

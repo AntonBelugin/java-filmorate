@@ -1,41 +1,27 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ErrorResponse;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
     private final ValidateService validateService;
     private Long currentId = 0L;
-    private final UserStorage userStorage;
-
-    @Autowired
-    public UserController(ValidateService validateService, UserStorage userStorage, UserService userService) {
-        this.validateService = validateService;
-        this.userStorage = userStorage;
-        this.userService = userService;
-    }
 
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("==> POST /users");
         validateService.validateUser(user);
         user.setId(getNextId());
-        //users.put(user.getId(), user);
-        userStorage.save(user);
+        userService.create(user);
         log.info("<== POST /users {}", user);
         return user;
     }
@@ -44,10 +30,7 @@ public class UserController {
     public User update(@RequestBody User upUser) {
         log.info("==> PUT /users");
         validateService.validateUpdateUser(upUser);
-        if (!userStorage.getUsers().containsKey(upUser.getId())) {
-            throw new NotFoundException("Неверный Id");
-        }
-        userStorage.update(upUser);
+        userService.update(upUser);
         log.info("<== PUT /users {}", upUser);
         return upUser;
     }
@@ -55,8 +38,8 @@ public class UserController {
     @GetMapping
     public Collection<User> findAll() {
         log.info("==> GET /users");
-        log.info("<== GET /users {}", userStorage.findAll());
-        return userStorage.findAll();
+        log.info("<== GET /users {}", userService.findAll());
+        return userService.findAll();
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -83,8 +66,9 @@ public class UserController {
         return userService.findCommonFriends(id, otherId);
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+
+
+   /* @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final ValidationException e) {
         return new ErrorResponse(
                 "Ошибка с параметрами",
@@ -108,7 +92,7 @@ public class UserController {
                 "Внутренняя ошибка сервера",
                 e.getMessage()
         );
-    }
+    }*/
 
     private long getNextId() {
         return ++currentId;

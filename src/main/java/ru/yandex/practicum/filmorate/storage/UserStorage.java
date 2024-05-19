@@ -27,4 +27,6 @@ public interface UserStorage {
     Map<Long, User> getUsers();
 
     HashMap<Long, Set<Long>> getUserFriendsIds();
+
+    void testUser(long userId);
 }

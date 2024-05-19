@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.controller.ValidateService;
@@ -17,7 +19,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
 import java.time.LocalDate;
 
 public class ValidateServiceTest {
@@ -39,13 +40,12 @@ public class ValidateServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        validateService = new ValidateServiceImp();
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         filmService = new FilmService(filmStorage, userStorage);
         userService = new UserService(userStorage);
-        filmController = new FilmController(validateService, filmStorage, filmService);
-        userController = new UserController(validateService, userStorage, userService);
+        //filmController = new FilmController();
+        //userController = new UserController();
     }
 
     void setUser() {
@@ -67,8 +67,8 @@ public class ValidateServiceTest {
     @Test
     void testCreateUser() {
         setUser();
-        User newUser = userController.create(user);
-        Assertions.assertEquals(user, newUser);
+        userService.create(user);
+        Assertions.assertEquals(user, userStorage.getUsers().get(user.getId()));
     }
 
     @Test

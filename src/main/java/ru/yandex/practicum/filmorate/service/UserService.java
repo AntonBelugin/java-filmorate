@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
@@ -17,23 +16,28 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public void create(User user) {
+        userStorage.save(user);
+    }
+
+    public void update(User upUser) {
+        userStorage.testUser(upUser.getId());
+        userStorage.update(upUser);
+    }
+
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
+
     public void addFriends(long userId, long friendId) {
-        if (!userStorage.getUsers().containsKey(userId)) {
-            throw new NotFoundException("Неверный Id пользователя");
-        }
-        if (!userStorage.getUsers().containsKey(friendId)) {
-            throw new NotFoundException("Неверный Id друга");
-        }
+        userStorage.testUser(userId);
+        userStorage.testUser(friendId);
         userStorage.addFriends(userId, friendId);
     }
 
     public void deleteFriends(long userId, long friendId) {
-        if (!userStorage.getUsers().containsKey(userId)) {
-            throw new NotFoundException("Неверный Id пользователя");
-        }
-        if (!userStorage.getUsers().containsKey(friendId)) {
-            throw new NotFoundException("Неверный Id друга");
-        }
+        userStorage.testUser(userId);
+        userStorage.testUser(friendId);
         if (userStorage.getUserFriendsIds().containsKey(userId) &&
                 userStorage.getUserFriendsIds().get(userId).contains(friendId)) {
             userStorage.deleteFriends(userId, friendId);
@@ -41,19 +45,14 @@ public class UserService {
     }
 
     public Collection<User> findFriends(long userId) {
-        if (!userStorage.getUsers().containsKey(userId)) {
-            throw new NotFoundException("Неверный Id пользователя");
-        }
+        userStorage.testUser(userId);
         return userStorage.findFriends(userId);
     }
 
     public Collection<User> findCommonFriends(long userId, long otherId) {
-        if (!userStorage.getUsers().containsKey(userId)) {
-            throw new NotFoundException("Неверный Id пользователя");
-        }
-        if (!userStorage.getUsers().containsKey(otherId)) {
-            throw new NotFoundException("Неверный Id друга");
-        }
+        userStorage.testUser(userId);
+        userStorage.testUser(otherId);
         return userStorage.findCommonFriends(userId, otherId);
     }
+
 }

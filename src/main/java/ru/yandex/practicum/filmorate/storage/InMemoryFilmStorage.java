@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private Map<Long, Film> films = new HashMap<>();
+    private HashMap<Long, Film> films = new HashMap<>();
     private HashMap<Long, Set<Long>> filmLikes = new HashMap<>();
 
     @Override
@@ -48,10 +49,10 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Collection<Film> mostLike(int count) {
-        Map<Long, Integer> map = new HashMap<>();
-        filmLikes.forEach((key, value) -> map.put(key, value.size()));
+        HashMap<Long, Integer> filmsCountLike = new HashMap<>();
+        filmLikes.forEach((key, value) -> filmsCountLike.put(key, value.size()));
 
-        Map<Long, Integer> sortedMap = map.entrySet().stream()
+        Map<Long, Integer> sortedMap = filmsCountLike.entrySet().stream()
                 .sorted(Comparator.comparingInt(e -> -e.getValue()))
                 .collect(Collectors
                         .toMap(Map.Entry::getKey,
@@ -62,14 +63,21 @@ public class InMemoryFilmStorage implements FilmStorage {
         List<Long> listId = new ArrayList<>();
         sortedMap.forEach((key, value) -> listId.add(key));
 
-        Collection<Film> result = new ArrayList<>();
         if (listId.size() <= count) {
             count = listId.size();
         }
-        for (int i = 0; i < count; i++) {
-                result.add(films.get(listId.get(i)));
-            }
-        return result;
+
+        return listId.stream()
+                .limit(count)
+                .map(id -> films.get(id))
+                .toList();
+    }
+
+    @Override
+    public void testFilm(long filmId) {
+        if (!films.containsKey(filmId)) {
+            throw new NotFoundException("Фильма с id " + filmId + " не существует");
+        }
     }
 
     public Map<Long, Film> getFilms() {

@@ -1,40 +1,31 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ErrorResponse;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.Collection;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@RequiredArgsConstructor
+@Component
 public class FilmController {
     private final FilmService filmService;
     private final ValidateService validateService;
     private Long currentId = 0L;
-    private final FilmStorage filmStorage;
 
-    @Autowired
-    public FilmController(ValidateService validateService, FilmStorage filmStorage, FilmService filmService) {
-        this.validateService = validateService;
-        this.filmStorage = filmStorage;
-        this.filmService = filmService;
-    }
 
     @PostMapping
     public Film create(@RequestBody Film film) {
         log.info("==> POST /films");
         validateService.validateFilm(film);
         film.setId(getNextId());
-        filmStorage.add(film);
+        filmService.create(film);
         log.info("<== POST /films {}", film);
         return film;
     }
@@ -43,18 +34,15 @@ public class FilmController {
     public Film update(@RequestBody Film upFilm) {
         log.info("==> PUT /films");
         validateService.validateUpdateFilm(upFilm);
-        if (!filmStorage.getFilms().containsKey(upFilm.getId())) {
-            throw new NotFoundException("Неверный Id");
-        }
-        filmStorage.update(upFilm);
+        filmService.update(upFilm);
         log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("<== GET /films {}", filmStorage.getAll());
-        return filmStorage.getAll();
+        log.info("<== GET /films {}", filmService.findAll());
+        return filmService.findAll();
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -75,7 +63,7 @@ public class FilmController {
         return filmService.mostLike(count);
     }
 
-    @ExceptionHandler
+  /*  @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handle(final ValidationException e) {
         return new ErrorResponse(
@@ -100,7 +88,7 @@ public class FilmController {
                 "Внутренняя ошибка сервера",
                 e.getMessage()
         );
-    }
+    }*/
 
     private long getNextId() {
         return ++currentId;
