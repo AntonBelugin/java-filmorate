@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
 import java.util.Collection;
 
 @RestController
@@ -63,34 +62,8 @@ public class FilmController {
         return filmService.mostLike(count);
     }
 
-  /*  @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handle(final ValidationException e) {
-        return new ErrorResponse(
-                "Ошибка с параметрами",
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final NotFoundException e) {
-        return new ErrorResponse(
-                "Неправильный ввод данных",
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(final RuntimeException e) {
-        return new ErrorResponse(
-                "Внутренняя ошибка сервера",
-                e.getMessage()
-        );
-    }*/
-
     private long getNextId() {
         return ++currentId;
     }
+
 }

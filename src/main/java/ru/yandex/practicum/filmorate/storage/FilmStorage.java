@@ -23,5 +23,5 @@ public interface FilmStorage {
 
     Map<Long, Film> getFilms();
 
-    public void testFilm(long filmId);
+    void testFilm(long filmId);
 }

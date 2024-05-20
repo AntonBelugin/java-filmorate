@@ -1,10 +1,8 @@
 package ru.yandex.practicum.filmorate;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.controller.ValidateService;
@@ -40,12 +38,13 @@ public class ValidateServiceTest {
 
     @BeforeEach
     void beforeEach() {
+        validateService = new ValidateServiceImp();
         filmStorage = new InMemoryFilmStorage();
         userStorage = new InMemoryUserStorage();
         filmService = new FilmService(filmStorage, userStorage);
         userService = new UserService(userStorage);
-        //filmController = new FilmController();
-        //userController = new UserController();
+        filmController = new FilmController(filmService, validateService);
+        userController = new UserController(userService, validateService);
     }
 
     void setUser() {
@@ -140,7 +139,7 @@ public class ValidateServiceTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             userController.update(user);
         });
-        Assertions.assertEquals("Неверный Id", exception.getMessage());
+        Assertions.assertEquals("Пользователя с id 2 не существует", exception.getMessage());
 
         user.setId(null);
         ValidationException exception2 = Assertions.assertThrows(ValidationException.class, () -> {
@@ -221,7 +220,7 @@ public class ValidateServiceTest {
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             filmController.update(film);
         });
-        Assertions.assertEquals("Неверный Id", exception.getMessage());
+        Assertions.assertEquals("Фильма с id 2 не существует", exception.getMessage());
 
         film.setId(null);
         ValidationException exception2 = Assertions.assertThrows(ValidationException.class, () -> {

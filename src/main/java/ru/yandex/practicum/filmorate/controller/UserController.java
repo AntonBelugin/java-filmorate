@@ -66,34 +66,6 @@ public class UserController {
         return userService.findCommonFriends(id, otherId);
     }
 
-
-
-   /* @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handle(final ValidationException e) {
-        return new ErrorResponse(
-                "Ошибка с параметрами",
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final NotFoundException e) {
-        return new ErrorResponse(
-                "Неправильный ввод данных",
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handle(final RuntimeException e) {
-        return new ErrorResponse(
-                "Внутренняя ошибка сервера",
-                e.getMessage()
-        );
-    }*/
-
     private long getNextId() {
         return ++currentId;
     }
