@@ -7,16 +7,26 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.controller.ValidateService;
 import ru.yandex.practicum.filmorate.controller.ValidateServiceImp;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.time.LocalDate;
 
 public class ValidateServiceTest {
     private ValidateService validateService;
     private FilmController filmController;
     private UserController userController;
+    private FilmStorage filmStorage;
+    private FilmService filmService;
+    private UserStorage userStorage;
+    private UserService userService;
     private User user;
     private Film film;
     private String failDescription = "12345678901234567890" +
@@ -29,8 +39,12 @@ public class ValidateServiceTest {
     @BeforeEach
     void beforeEach() {
         validateService = new ValidateServiceImp();
-        filmController = new FilmController(validateService);
-        userController = new UserController(validateService);
+        filmStorage = new InMemoryFilmStorage();
+        userStorage = new InMemoryUserStorage();
+        filmService = new FilmService(filmStorage, userStorage);
+        userService = new UserService(userStorage);
+        filmController = new FilmController(filmService, validateService);
+        userController = new UserController(userService, validateService);
     }
 
     void setUser() {
@@ -52,8 +66,8 @@ public class ValidateServiceTest {
     @Test
     void testCreateUser() {
         setUser();
-        User newUser = userController.create(user);
-        Assertions.assertEquals(user, newUser);
+        userService.create(user);
+        Assertions.assertEquals(user, userStorage.getUsers().get(user.getId()));
     }
 
     @Test
@@ -122,10 +136,10 @@ public class ValidateServiceTest {
         userController.create(user);
 
         user.setId(2L);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             userController.update(user);
         });
-        Assertions.assertEquals("Неверный Id", exception.getMessage());
+        Assertions.assertEquals("Пользователя с id 2 не существует", exception.getMessage());
 
         user.setId(null);
         ValidationException exception2 = Assertions.assertThrows(ValidationException.class, () -> {
@@ -203,10 +217,10 @@ public class ValidateServiceTest {
         filmController.create(film);
 
         film.setId(2L);
-        ValidationException exception = Assertions.assertThrows(ValidationException.class, () -> {
+        NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             filmController.update(film);
         });
-        Assertions.assertEquals("Неверный Id", exception.getMessage());
+        Assertions.assertEquals("Фильма с id 2 не существует", exception.getMessage());
 
         film.setId(null);
         ValidationException exception2 = Assertions.assertThrows(ValidationException.class, () -> {

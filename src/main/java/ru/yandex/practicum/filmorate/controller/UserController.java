@@ -1,32 +1,27 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-
+import ru.yandex.practicum.filmorate.service.UserService;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
-    private Map<Long, User> users = new HashMap<>();
-    private ValidateService validateService;
+    private final UserService userService;
+    private final ValidateService validateService;
     private Long currentId = 0L;
-
-    public UserController(ValidateService validateService) {
-        this.validateService = validateService;
-    }
 
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("==> POST /users");
         validateService.validateUser(user);
         user.setId(getNextId());
-        users.put(user.getId(), user);
+        userService.create(user);
         log.info("<== POST /users {}", user);
         return user;
     }
@@ -35,10 +30,7 @@ public class UserController {
     public User update(@RequestBody User upUser) {
         log.info("==> PUT /users");
         validateService.validateUpdateUser(upUser);
-        if (!users.containsKey(upUser.getId())) {
-            throw new ValidationException("Неверный Id");
-        }
-        users.put(upUser.getId(), upUser);
+        userService.update(upUser);
         log.info("<== PUT /users {}", upUser);
         return upUser;
     }
@@ -46,8 +38,32 @@ public class UserController {
     @GetMapping
     public Collection<User> findAll() {
         log.info("==> GET /users");
-        log.info("<== GET /users {}", users.values());
-        return users.values();
+        log.info("<== GET /users {}", userService.findAll());
+        return userService.findAll();
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable long id,  @PathVariable long friendId) {
+        log.info("==> PUT /users/{id}/friends/{friendId}");
+        userService.addFriends(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable long id,  @PathVariable long friendId) {
+        log.info("==> DELETE /users/{id}/friends/{friendId}");
+        userService.deleteFriends(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public Collection<User> findFriends(@PathVariable long id) {
+        log.info("==> GET /users/{id}/friends");
+        return userService.findFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Collection<User> findCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info("==> GET /users/{id}/friends/common/{otherId}");
+        return userService.findCommonFriends(id, otherId);
     }
 
     private long getNextId() {

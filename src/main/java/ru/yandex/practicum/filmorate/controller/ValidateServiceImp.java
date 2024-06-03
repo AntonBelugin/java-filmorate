@@ -29,7 +29,6 @@ public class ValidateServiceImp implements ValidateService {
         if (upUser.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-
         validateUser(upUser);
     }
 
@@ -47,7 +46,6 @@ public class ValidateServiceImp implements ValidateService {
         if (film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма меньше нуля");
         }
-
     }
 
     @Override
@@ -57,4 +55,5 @@ public class ValidateServiceImp implements ValidateService {
         }
         validateFilm(upFilm);
     }
+
 }
