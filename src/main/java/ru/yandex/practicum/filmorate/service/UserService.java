@@ -2,6 +2,10 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.UserDto;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
@@ -20,9 +24,20 @@ public class UserService {
         userStorage.save(user);
     }
 
-    public void update(User upUser) {
-        userStorage.testUser(upUser.getId());
-        userStorage.update(upUser);
+    public UserDto update(UpdateUserRequest request) {
+        User updatedUser = userStorage.findById(request.getId())
+                .map(user -> UserMapper.updateUserFields(user, request))
+                .orElseThrow(() -> new NotFoundException("Пользователя с id " + request.getId() + " не существует"));
+
+        System.out.println();
+        System.out.println(updatedUser);
+        System.out.println();
+        System.out.println("Service");
+        //userStorage.findById(upUser.getId());
+        System.out.println();
+        System.out.println(789);
+        userStorage.update(updatedUser);
+        return UserMapper.mapToUserDto(updatedUser);
     }
 
     public Collection<User> findAll() {
@@ -30,14 +45,14 @@ public class UserService {
     }
 
     public void addFriends(long userId, long friendId) {
-        userStorage.testUser(userId);
-        userStorage.testUser(friendId);
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
         userStorage.addFriends(userId, friendId);
     }
 
     public void deleteFriends(long userId, long friendId) {
-        userStorage.testUser(userId);
-        userStorage.testUser(friendId);
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
         if (userStorage.getUserFriendsIds().containsKey(userId) &&
                 userStorage.getUserFriendsIds().get(userId).contains(friendId)) {
             userStorage.deleteFriends(userId, friendId);
@@ -45,13 +60,13 @@ public class UserService {
     }
 
     public Collection<User> findFriends(long userId) {
-        userStorage.testUser(userId);
+        userStorage.findById(userId);
         return userStorage.findFriends(userId);
     }
 
     public Collection<User> findCommonFriends(long userId, long otherId) {
-        userStorage.testUser(userId);
-        userStorage.testUser(otherId);
+        userStorage.findById(userId);
+        userStorage.findById(otherId);
         return userStorage.findCommonFriends(userId, otherId);
     }
 

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Film.
@@ -13,4 +14,6 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     private int duration;
+    private Set<Genre> genre;
+    private String rating;
 }

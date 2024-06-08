@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
 
 @Data
 @Getter
@@ -15,4 +18,6 @@ public class User {
     private String login;
     private String name;
     private LocalDate birthday;
+    private Set<Integer> friends;
+    private Set<Integer> requestFriends;
 }

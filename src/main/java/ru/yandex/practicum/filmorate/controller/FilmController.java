@@ -21,44 +21,44 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) {
-        log.info("==> POST /films");
+      //  log.info("==> POST /films");
         validateService.validateFilm(film);
         film.setId(getNextId());
         filmService.create(film);
-        log.info("<== POST /films {}", film);
+     //   log.info("<== POST /films {}", film);
         return film;
     }
 
     @PutMapping
     public Film update(@RequestBody Film upFilm) {
-        log.info("==> PUT /films");
+     //   log.info("==> PUT /films");
         validateService.validateUpdateFilm(upFilm);
         filmService.update(upFilm);
-        log.info("<== PUT /films {}", upFilm);
+     //   log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("<== GET /films {}", filmService.findAll());
+      //  log.info("<== GET /films {}", filmService.findAll());
         return filmService.findAll();
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable long id,  @PathVariable long userId) {
-        log.info("==> PUT /films/{id}/like/{userId}");
+     //   log.info("==> PUT /films/{id}/like/{userId}");
         filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable long id,  @PathVariable long userId) {
-        log.info("==> DELETE /films/{id}/like/{userId}");
+     //   log.info("==> DELETE /films/{id}/like/{userId}");
         filmService.deleteLike(id, userId);
     }
 
     @GetMapping("/popular")
     public Collection<Film> mostLike(@RequestParam(defaultValue = "10") int count) {
-        log.info("==> GET /films/popular?count=");
+      //  log.info("==> GET /films/popular?count=");
         return filmService.mostLike(count);
     }
 

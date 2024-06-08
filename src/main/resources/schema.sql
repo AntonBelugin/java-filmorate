@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(60) NOT NULL,
+    login VARCHAR(60) NOT NULL,
+    name VARCHAR(60) NOT NULL,
+    birthday DATE
+);
+
+CREATE TABLE IF NOT EXISTS friends (
+    user_id BIGINT NOT NULL REFERENCES users(id),
+    friend_id BIGINT NOT NULL REFERENCES users(id)
+);

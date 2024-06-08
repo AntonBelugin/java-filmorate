@@ -32,13 +32,13 @@ public class FilmService {
     }
 
     public void addLike(long id, long userId) {
-        userStorage.testUser(userId);
+        userStorage.findById(userId);
         filmStorage.testFilm(id);
         filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(long id, long userId) {
-        userStorage.testUser(userId);
+        userStorage.findById(userId);
         filmStorage.testFilm(id);
         filmStorage.deleteLike(id, userId);
     }
