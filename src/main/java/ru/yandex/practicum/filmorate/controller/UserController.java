@@ -42,11 +42,12 @@ public class UserController {
     public UserDto update(@RequestBody UpdateUserRequest request) {
         log.info("==> PUT /users {}", request);
         validateService.validateUpdateUser(request);
-        System.out.println();
+       /* System.out.println();
         System.out.println();
         System.out.println(request);
         System.out.println();
-        System.out.println("control");
+        System.out.println("control");*/
+
      /*   jdbc.update(
                 UPDATE_QUERY,
                 upUser.getEmail(),
@@ -56,8 +57,8 @@ public class UserController {
                 upUser.getId()
         );*/
         UserDto userDto = userService.update(request);
-        System.out.println();
-        System.out.println(123);
+      /*  System.out.println();
+        System.out.println(123);*/
         log.info("<== PUT /users {}", userDto);
         return userDto;
     }

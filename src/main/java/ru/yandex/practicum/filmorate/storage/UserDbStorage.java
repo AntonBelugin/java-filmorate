@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.mapper.Mapper;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -112,17 +111,18 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> findById(long userId) {
+    public User findById(long userId) {
         System.out.println(456);
         try {
             User user = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, userId);
             System.out.println(user);
             System.out.println();
             System.out.println("storage find id");
-            return Optional.ofNullable(user);
+            return user;
         } catch (EmptyResultDataAccessException ignored) {
             System.out.println("catch");
-            return Optional.empty();
+            throw new NotFoundException("Пользователя с id " + userId + " не существует");
+           // return Optional.empty();
           //  throw new NotFoundException("Пользователя с id " + userId + " не существует");
             }
        /* if (jdbc.queryForObject(FIND_BY_ID_QUERY, Integer.class, userId) == 0) {

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.Collection;
@@ -20,13 +21,16 @@ public class FilmController {
 
 
     @PostMapping
-    public Film create(@RequestBody Film film) {
+    public CreateFilmRequest create(@RequestBody CreateFilmRequest request) {
       //  log.info("==> POST /films");
-        validateService.validateFilm(film);
-        film.setId(getNextId());
-        filmService.create(film);
+        System.out.println();
+        System.out.println(request);
+        System.out.println();
+        validateService.validateFilm(request);
+     //   film.setId(getNextId());
+        filmService.create(request);
      //   log.info("<== POST /films {}", film);
-        return film;
+        return request;
     }
 
     @PutMapping

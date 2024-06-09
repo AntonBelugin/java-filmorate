@@ -25,19 +25,21 @@ public class UserService {
     }
 
     public UserDto update(UpdateUserRequest request) {
-        User updatedUser = userStorage.findById(request.getId())
-                .map(user -> UserMapper.updateUserFields(user, request))
-                .orElseThrow(() -> new NotFoundException("Пользователя с id " + request.getId() + " не существует"));
+        User updatedUser = userStorage.findById(request.getId());
+        User updUser = UserMapper.updateUserFields(updatedUser, request);
+
+         //       .map(user -> UserMapper.updateUserFields(user, request))
+         //       .orElseThrow(() -> new NotFoundException("Пользователя с id " + request.getId() + " не существует"));
 
         System.out.println();
-        System.out.println(updatedUser);
+        System.out.println(updUser);
         System.out.println();
         System.out.println("Service");
         //userStorage.findById(upUser.getId());
         System.out.println();
         System.out.println(789);
-        userStorage.update(updatedUser);
-        return UserMapper.mapToUserDto(updatedUser);
+        userStorage.update(updUser);
+        return UserMapper.mapToUserDto(updUser);
     }
 
     public Collection<User> findAll() {

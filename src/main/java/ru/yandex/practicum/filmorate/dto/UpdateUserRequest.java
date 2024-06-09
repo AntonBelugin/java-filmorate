@@ -1,11 +1,15 @@
 package ru.yandex.practicum.filmorate.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Date;
 
 @Data
+@Getter
+@Setter
 public class UpdateUserRequest {
     private Long id;
     private String email;

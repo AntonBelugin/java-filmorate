@@ -26,5 +26,5 @@ public interface UserStorage {
 
     HashMap<Long, Set<Long>> getUserFriendsIds();
 
-    Optional<User> findById(long userId);
+    User findById(long userId);
 }

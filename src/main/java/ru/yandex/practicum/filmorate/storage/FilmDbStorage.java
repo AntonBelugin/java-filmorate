@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -8,13 +11,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class InMemoryFilmStorage implements FilmStorage {
+@RequiredArgsConstructor
+public class FilmDbStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
     private HashMap<Long, Set<Long>> filmLikes = new HashMap<>();
+    private final JdbcTemplate jdbc;
+    private static final String INSERT_QUERY = "INSERT INTO films (name, description, releasedate, duration, mpa)" +
+            " VALUES (?, ?, ?, ?, ?)";
 
     @Override
-    public void add(Film film) {
-        films.put(film.getId(), film);
+    public void add(CreateFilmRequest request) {
+        jdbc.update(INSERT_QUERY,
+                request.getName(),
+                request.getDescription(),
+                request.getReleaseDate(),
+                request.getDuration(),
+                request.getMpa().getId());
     }
 
     @Override

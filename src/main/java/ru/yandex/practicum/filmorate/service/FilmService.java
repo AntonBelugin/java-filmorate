@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -18,8 +19,8 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public void create(Film film) {
-        filmStorage.add(film);
+    public void create(CreateFilmRequest request) {
+        filmStorage.add(request);
     }
 
     public void update(Film upFilm) {

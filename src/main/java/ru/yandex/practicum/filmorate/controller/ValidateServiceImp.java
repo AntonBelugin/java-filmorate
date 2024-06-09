@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -47,17 +48,17 @@ public class ValidateServiceImp implements ValidateService {
     }
 
     @Override
-    public void validateFilm(Film film) {
-        if (film.getName() == null || film.getName().isBlank()) {
+    public void validateFilm(CreateFilmRequest request) {
+        if (request.getName() == null || request.getName().isBlank()) {
             throw new ValidationException("Не указано название");
         }
-        if (film.getDescription().length() > 200) {
+        if (request.getDescription().length() > 200) {
             throw new ValidationException("Описание должно быть не более 200 символов");
         }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        if (request.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Неправильно указана дата релиза");
         }
-        if (film.getDuration() <= 0) {
+        if (request.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма меньше нуля");
         }
     }
@@ -67,7 +68,7 @@ public class ValidateServiceImp implements ValidateService {
         if (upFilm.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        validateFilm(upFilm);
+        //validateFilm(upFilm);
     }
 
 }

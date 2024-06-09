@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -11,7 +12,7 @@ public interface ValidateService {
 
     void validateUpdateUser(UpdateUserRequest request);
 
-    void validateFilm(Film film);
+    void validateFilm(CreateFilmRequest request);
 
     void validateUpdateFilm(Film film);
 }
