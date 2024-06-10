@@ -2,13 +2,15 @@ package ru.yandex.practicum.filmorate.mappers;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.model.User;
 
+@Component
 @NoArgsConstructor//(access = AccessLevel.PRIVATE)
 public final class UserMapper {
-   /* public static User mapToUser(NewUserRequest request) {
+  /*  public static User mapToUser(NewUserRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());

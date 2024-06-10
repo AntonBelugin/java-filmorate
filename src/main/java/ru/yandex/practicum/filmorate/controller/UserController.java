@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
 import ru.yandex.practicum.filmorate.dto.UserDto;
@@ -15,6 +16,7 @@ import java.util.Collection;
 @RequestMapping("/users")
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class UserController {
     private final UserService userService;
     private final ValidateService validateService;
@@ -24,13 +26,13 @@ public class UserController {
 
     @PostMapping
     public User create(@RequestBody User user) {
-     //   log.info("==> POST /users");
+     /*   log.info("==> POST /users");
         //String filmsTableQuery = "SELECT COUNT(*) FROM users";
        // System.out.print("result");
        // System.out.print("result" + jdbc.queryForObject(filmsTableQuery, Integer.class) + "  result");
         //String query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
      //   jdbc.update(query,
-      //          "user", "us@mail.ru", "123");
+      //          "user", "us@mail.ru", "123");*/
         validateService.validateUser(user);
         //user.setId(getNextId());
         userService.create(user);
@@ -39,14 +41,17 @@ public class UserController {
     }
 
     @PutMapping
-    public UserDto update(@RequestBody UpdateUserRequest request) {
-        log.info("==> PUT /users {}", request);
-        validateService.validateUpdateUser(request);
-       /* System.out.println();
+    public User update(@RequestBody User user) {
+        log.info("==> PUT /films");
         System.out.println();
-        System.out.println(request);
+        System.out.println(user);
+        System.out.println("validate test");
+        validateService.validateUpdateUser(user);
+       // System.out.println();
         System.out.println();
-        System.out.println("control");*/
+        System.out.println(user);
+        System.out.println();
+        System.out.println("validate ok");
 
      /*   jdbc.update(
                 UPDATE_QUERY,
@@ -56,11 +61,14 @@ public class UserController {
                 upUser.getBirthday(),
                 upUser.getId()
         );*/
-        UserDto userDto = userService.update(request);
+        User upUser = userService.update(user);
       /*  System.out.println();
         System.out.println(123);*/
-        log.info("<== PUT /users {}", userDto);
-        return userDto;
+        System.out.println();
+        System.out.println(upUser);
+        System.out.println("posle update");
+      //  log.info("<== PUT /users {}", upUser);
+        return upUser;
     }
 
     @GetMapping

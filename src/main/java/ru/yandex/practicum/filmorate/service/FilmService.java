@@ -19,12 +19,12 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    public void create(CreateFilmRequest request) {
-        filmStorage.add(request);
+    public Film create(Film film) {
+        return filmStorage.add(film);
     }
 
     public void update(Film upFilm) {
-        filmStorage.testFilm(upFilm.getId());
+       //filmStorage.testFilm(upFilm.getId());
         filmStorage.update(upFilm);
     }
 

@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,7 +15,7 @@ public class Film {
     private String name;
     private String description;
     private LocalDate releaseDate;
-    private int duration;
-    private Set<Genre> genre;
-    private String mpa;
+    private Integer duration;
+    private Mpa mpa;
+    private List<Genre> genres = new ArrayList<>();
 }

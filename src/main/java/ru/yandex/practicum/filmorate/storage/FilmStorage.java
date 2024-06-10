@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface FilmStorage {
 
-    void add(CreateFilmRequest request);
+    Film add(Film film);
 
     void remove(Film film);
 

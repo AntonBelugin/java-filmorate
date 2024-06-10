@@ -13,12 +13,15 @@ public class ValidateServiceImp implements ValidateService {
     @Override
     public void validateUser(User user) {
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            System.out.println("Неправильный Имейл");
             throw new ValidationException("Неправильный Имейл");
         }
         if (user.getLogin() == null || user.getLogin().contains(" ")) {
+            System.out.println("Неправильный Логин");
             throw new ValidationException("Неправильный Логин");
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
+            System.out.println("Неправильно указана дата рождения");
             throw new ValidationException("Неправильно указана дата рождения");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
@@ -27,38 +30,25 @@ public class ValidateServiceImp implements ValidateService {
     }
 
     @Override
-    public void validateUpdateUser(UpdateUserRequest request) {
-        if (request.getId() == null) {
+    public void validateUpdateUser(User user) {
+        if (user.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        if (request.getEmail() == null || !request.getEmail().contains("@")) {
-            throw new ValidationException("Неправильный Имейл");
-        }
-        if (request.getLogin() == null || request.getLogin().contains(" ")) {
-            throw new ValidationException("Неправильный Логин");
-        }
-        if (request.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Неправильно указана дата рождения");
-        }
-        if (request.getName() == null || request.getName().isEmpty()) {
-            request.setName(request.getLogin());
-        }
-
-       // validateUser(upUser);
+       validateUser(user);
     }
 
     @Override
-    public void validateFilm(CreateFilmRequest request) {
-        if (request.getName() == null || request.getName().isBlank()) {
+    public void validateFilm(Film film) {
+        if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Не указано название");
         }
-        if (request.getDescription().length() > 200) {
+        if (film.getDescription().length() > 200) {
             throw new ValidationException("Описание должно быть не более 200 символов");
         }
-        if (request.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Неправильно указана дата релиза");
         }
-        if (request.getDuration() <= 0) {
+        if (film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма меньше нуля");
         }
     }
@@ -68,7 +58,7 @@ public class ValidateServiceImp implements ValidateService {
         if (upFilm.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        //validateFilm(upFilm);
+        validateFilm(upFilm);
     }
 
 }

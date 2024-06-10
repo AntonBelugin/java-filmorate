@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 
 @Component
-@Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private Map<Long, User> users = new HashMap<>();
@@ -20,17 +19,18 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> mapper;
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
-    private static final String INSERT_QUERY = "INSERT INTO users (email, login, name, birthday)" +
+    private static final String INSERT_QUERY = "INSERT INTO users (login, name, email, birthday)" +
             " VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE users SET login=?, name=?, email=?, birthday=? WHERE id=?";
+    //private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?, duration=?, mpa=? WHERE id = ?";
 
     @Override
     public void save(User user) {
        jdbc.update(
                 INSERT_QUERY,
-                user.getEmail(),
                 user.getLogin(),
                 user.getName(),
+                user.getEmail(),
                 user.getBirthday()
         );
     }
@@ -47,20 +47,21 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void update(User upUser) {
+    public User update(User user) {
         System.out.println();
-        System.out.println();
-        System.out.println();
-        System.out.println(upUser);
-        System.out.println();
+        System.out.println(user);
+        System.out.println("update");
         jdbc.update(
                 UPDATE_QUERY,
-                upUser.getEmail(),
-                upUser.getLogin(),
-                upUser.getName(),
-                upUser.getBirthday(),
-                upUser.getId()
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                user.getBirthday(),
+                user.getId()
         );
+        System.out.println();
+        System.out.println("update ok");
+        return user;
     }
 
     @Override
@@ -111,17 +112,20 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User findById(long userId) {
-        System.out.println(456);
+    public Optional<User> findById(long userId) {
+        System.out.println("find check");
         try {
-            User user = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, userId);
+            User user = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, (int) userId);
+            System.out.println();
             System.out.println(user);
             System.out.println();
-            System.out.println("storage find id");
-            return user;
+            System.out.println("find ok");
+            return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException ignored) {
             System.out.println("catch");
-            throw new NotFoundException("Пользователя с id " + userId + " не существует");
+            return Optional.empty();
+          //  System.out.println("catch");
+          //  throw new NotFoundException("Пользователя с id " + userId + " не существует");
            // return Optional.empty();
           //  throw new NotFoundException("Пользователя с id " + userId + " не существует");
             }

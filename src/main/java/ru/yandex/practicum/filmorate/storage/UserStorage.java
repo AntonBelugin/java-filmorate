@@ -10,7 +10,7 @@ public interface UserStorage {
 
     void delete(User user);
 
-    void update(User user);
+   User update(User user);
 
     Collection<User> findAll();
 
@@ -26,5 +26,5 @@ public interface UserStorage {
 
     HashMap<Long, Set<Long>> getUserFriendsIds();
 
-    User findById(long userId);
+    Optional<User> findById(long userId);
 }

@@ -10,9 +10,9 @@ import ru.yandex.practicum.filmorate.model.User;
 public interface ValidateService {
     void validateUser(User user);
 
-    void validateUpdateUser(UpdateUserRequest request);
+    void validateUpdateUser(User user);
 
-    void validateFilm(CreateFilmRequest request);
+    void validateFilm(Film film);
 
     void validateUpdateFilm(Film film);
 }
