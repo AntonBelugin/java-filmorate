@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -22,14 +25,15 @@ public class FilmDbStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
     private HashMap<Long, Set<Long>> filmLikes = new HashMap<>();
     private final JdbcTemplate jdbc;
+    private final RowMapper<Film> mapper;
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, releasedate, duration, mpa)" +
             " VALUES (?, ?, ?, ?, ?)";
     private static final String INSERT_QUERY_GENRE = "INSERT INTO genres (id_film, id_genre)" +
             " VALUES (?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?, duration=?, mpa=? WHERE id = ?";
-
-
-   // private static final String UPDATE_QUERY = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
+    private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?," +
+            " duration=?, mpa=? WHERE id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
+    private static final String FIND_ALL = "SELECT * FROM films";
 
     @Override
     public Film add(Film film) {
@@ -47,9 +51,6 @@ public class FilmDbStorage implements FilmStorage {
         System.out.println(keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
-        System.out.println();
-        System.out.println(id);
-        System.out.println();
         if (id != null) {
             film.setId(id);
         } else {
@@ -82,26 +83,25 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void update(Film upFilm) {
+    public Film update(Film film) {
        /* if (!films.containsKey(upFilm.getId())) {
             throw new ValidationException("Неверный Id");
         }*/
         //films.put(upFilm.getId(), upFilm);
         jdbc.update(UPDATE_QUERY,
-                upFilm.getName(),
-                upFilm.getDescription(),
-                upFilm.getReleaseDate(),
-                upFilm.getDuration(),
-                upFilm.getMpa().getId(),
-                upFilm.getId()
+                film.getName(),
+                film.getDescription(),
+                film.getReleaseDate(),
+                film.getDuration(),
+                film.getMpa().getId(),
+                film.getId()
         );
-
-
+        return film;
     }
 
     @Override
-    public Collection<Film> getAll() {
-        return films.values();
+    public List<Film> getAll() {
+        return jdbc.query(FIND_ALL, mapper);
     }
 
     @Override
@@ -143,14 +143,26 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void testFilm(long filmId) {
-        if (!films.containsKey(filmId)) {
-            throw new NotFoundException("Фильма с id " + filmId + " не существует");
+    public Optional<Film> findById(long filmId) {
+        try {
+            Film film = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, (int) filmId);
+          /*  System.out.println();
+            System.out.println(film);
+            System.out.println();
+            System.out.println("find ok");*/
+            return Optional.ofNullable(film);
+        } catch (EmptyResultDataAccessException ignored) {
+            System.out.println("catch");
+            return Optional.empty();
+
+           /* if (!films.containsKey(filmId)) {
+                throw new NotFoundException("Фильма с id " + filmId + " не существует");
+            }*/
         }
     }
 
-    public Map<Long, Film> getFilms() {
-        return films;
-    }
+   /* public List<Film> getFilms() {
+        return jdbc.query(FIND_ALL, mapper);
+    }*/
 
 }

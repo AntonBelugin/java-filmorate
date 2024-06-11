@@ -20,8 +20,8 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public void create(User user) {
-        userStorage.save(user);
+    public User create(User user) {
+        return userStorage.save(user);
     }
 
     public User update(User user) {

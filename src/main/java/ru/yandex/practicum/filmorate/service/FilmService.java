@@ -2,30 +2,58 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.CreateFilmRequest;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
+import java.util.List;
 
 @Service
 public class FilmService {
+    private final MpaDbStorage mpaDbStorage;
+    private final GenreDbStorage genreDbStorage;
     private FilmStorage filmStorage;
     private UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage, MpaDbStorage mpaDbStorage, GenreDbStorage genreDbStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.mpaDbStorage = mpaDbStorage;
+        this.genreDbStorage = genreDbStorage;
     }
 
     public Film create(Film film) {
+        List<String> genres = genreDbStorage.findAll();
+        for (int i = 0; i < film.getGenres().size(); i++) {
+            /*if (film.getGenres().get(i).getId() > genres.size()) {
+                throw new ValidationException("Жанра с id " + film.getGenres().get(i).getId() + " не существует");
+            }*/
+        }
+        if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
+            throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
+        }
         return filmStorage.add(film);
     }
 
-    public void update(Film upFilm) {
-       //filmStorage.testFilm(upFilm.getId());
-        filmStorage.update(upFilm);
+    public Film update(Film film) {
+        if (filmStorage.findById(film.getId()).isEmpty()) {
+            throw new NotFoundException("Фильма с id " + film.getId() + " не существует");
+        }
+        List<String> genres = genreDbStorage.findAll();
+        for (int i = 0; i < film.getGenres().size(); i++) {
+          /*  if (film.getGenres().get(i).getId() > genres.size()) {
+                throw new ValidationException("Жанра с id " + film.getGenres().get(i).getId() + " не существует");
+            }*/
+        }
+        if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
+            throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
+        }
+        return filmStorage.update(film);
     }
 
     public Collection<Film> findAll() {
@@ -34,13 +62,13 @@ public class FilmService {
 
     public void addLike(long id, long userId) {
         userStorage.findById(userId);
-        filmStorage.testFilm(id);
+        filmStorage.findById(id);
         filmStorage.addLike(id, userId);
     }
 
     public void deleteLike(long id, long userId) {
         userStorage.findById(userId);
-        filmStorage.testFilm(id);
+        filmStorage.findById(id);
         filmStorage.deleteLike(id, userId);
     }
 

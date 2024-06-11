@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface UserStorage {
 
-    void save(User user);
+    User save(User user);
 
     void delete(User user);
 

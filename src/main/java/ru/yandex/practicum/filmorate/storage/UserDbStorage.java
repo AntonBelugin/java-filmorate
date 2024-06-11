@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.*;
 
 @Component
@@ -25,21 +30,28 @@ public class UserDbStorage implements UserStorage {
     //private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?, duration=?, mpa=? WHERE id = ?";
 
     @Override
-    public void save(User user) {
-       jdbc.update(
-                INSERT_QUERY,
-                user.getLogin(),
-                user.getName(),
-                user.getEmail(),
-                user.getBirthday()
-        );
+    public User save(User user) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(INSERT_QUERY, Statement.RETURN_GENERATED_KEYS);
+            ps.setObject(1, user.getLogin());
+            ps.setObject(2, user.getName());
+            ps.setObject(3, user.getEmail());
+            ps.setObject(4, user.getBirthday());
+            return ps;
+        }, keyHolder);
+        Long id = keyHolder.getKeyAs(Long.class);
+        System.out.println();
+        System.out.println(id);
+        System.out.println();
+        if (id != null) {
+            user.setId(id);
+        } else {
+            throw new InternalServerException("Не удалось сохранить данные");
+        }
+        return user;
     }
-
-
-    /* @Override
-    public void save(User user) {
-        users.put(user.getId(), user);
-    }*/
 
     @Override
     public void delete(User user) {

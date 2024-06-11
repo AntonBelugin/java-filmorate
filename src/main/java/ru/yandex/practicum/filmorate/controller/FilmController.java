@@ -37,22 +37,24 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film update(@RequestBody Film upFilm) {
+    public Film update(@RequestBody Film film) {
         log.info("==> PUT /films");
         System.out.println();
         System.out.println("Update");
         System.out.println();
-        System.out.println(upFilm);
-        validateService.validateUpdateFilm(upFilm);
-        filmService.update(upFilm);
-     //   log.info("<== PUT /films {}", upFilm);
+        System.out.println(film);
+        validateService.validateUpdateFilm(film);
+        Film upFilm = filmService.update(film);
+        log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
     @GetMapping
     public Collection<Film> findAll() {
       //  log.info("<== GET /films {}", filmService.findAll());
-        return filmService.findAll();
+        Collection<Film> films = filmService.findAll();
+        System.out.println(films);
+        return films;
     }
 
     @PutMapping("/{id}/like/{userId}")

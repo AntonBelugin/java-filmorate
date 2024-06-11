@@ -35,9 +35,9 @@ public class UserController {
       //          "user", "us@mail.ru", "123");*/
         validateService.validateUser(user);
         //user.setId(getNextId());
-        userService.create(user);
-      //  log.info("<== POST /users {}", user);
-        return user;
+        User newUser = userService.create(user);
+        log.info("<== POST /users {}", newUser);
+        return newUser;
     }
 
     @PutMapping
