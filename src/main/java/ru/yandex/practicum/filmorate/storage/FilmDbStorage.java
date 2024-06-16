@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -12,9 +13,13 @@ import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,12 +33,11 @@ public class FilmDbStorage implements FilmStorage {
     private final RowMapper<Film> mapper;
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, releasedate, duration, mpa)" +
             " VALUES (?, ?, ?, ?, ?)";
-    private static final String INSERT_QUERY_GENRE = "INSERT INTO genres (id_film, id_genre)" +
-            " VALUES (?, ?)";
+
     private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?," +
             " duration=?, mpa=? WHERE id = ?";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
-    private static final String FIND_ALL = "SELECT * FROM films";
+    private static final String FIND_ALL = "SELECT * FROM films AS f JOIN GENRES G on f.ID = G.ID_FILM";
 
     @Override
     public Film add(Film film) {
@@ -48,24 +52,13 @@ public class FilmDbStorage implements FilmStorage {
             ps.setObject(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
-        System.out.println(keyHolder);
+     //   System.out.println(keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
         if (id != null) {
             film.setId(id);
         } else {
             throw new InternalServerException("Не удалось сохранить данные");
-        }
-
-        if (!film.getGenres().isEmpty()) {
-            for (int i = 0; i < film.getGenres().size(); i++) {
-                System.out.println(i);
-                System.out.println(film.getGenres().get(i));
-                jdbc.update(INSERT_QUERY_GENRE,
-                        film.getId(),
-                        film.getGenres().get(i).getId()
-                );
-            }
         }
 
         return film;
@@ -101,7 +94,12 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        return jdbc.query(FIND_ALL, mapper);
+        //LinkedList<Film> films = new LinkedList<>();
+        try {
+            return jdbc.query(FIND_ALL, new FilmResultSetExtractor());
+        } catch (EmptyResultDataAccessException ignored) {
+            return null;
+        }
     }
 
     @Override
@@ -161,8 +159,61 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
+        @Override
+        public List<Film> extractData(ResultSet rs) throws SQLException {
+            LinkedList<Film> filmList = new LinkedList<>();
+            if (!rs.isBeforeFirst() ) {
+                return filmList;
+            }
+            rs.next();
+            long count = 0;
+            Film film = new Film();
+            long filmId = rs.getLong("id");
+            film.setId(filmId);
+            film.setName(rs.getString("name"));
+            film.setDescription(rs.getString("description"));
+            film.setReleaseDate(rs.getDate("releasedate").toLocalDate());
+            film.setDuration(rs.getInt("duration"));
+            Mpa mpa = new Mpa();
+            mpa.setId(rs.getInt("mpa"));
+            film.setMpa(mpa);
+            LinkedHashSet<Genre> genres = new LinkedHashSet<>();
+            Genre genre = new Genre();
+            genre.setId(rs.getInt("id_genre"));
+            genres.add(genre);
+            film.setGenres(genres);
+            filmList.add(film);
+            while (rs.next()) {
+                filmId = rs.getLong("id");
+                if (filmId > count) {
+                    film = new Film();
+                    count = filmId;
+                    film.setId(filmId);
+                    film.setName(rs.getString("name"));
+                    film.setDescription(rs.getString("description"));
+                    film.setReleaseDate(rs.getDate("releasedate").toLocalDate());
+                    film.setDuration(rs.getInt("duration"));
+                    mpa = new Mpa();
+                    mpa.setId(rs.getInt("mpa"));
+                    film.setMpa(mpa);
+                    genres = new LinkedHashSet<>();
+                    genre = new Genre();
+                    genre.setId(rs.getInt("id_genre"));
+                    genres.add(genre);
+                    film.setGenres(genres);
+                    filmList.add(film);
+                }
+                genre = new Genre();
+                genre.setId(rs.getInt("id_genre"));
+                film.getGenres().add(genre);
+               // filmList.add(film);
+            }
+            return filmList;
+        }
    /* public List<Film> getFilms() {
         return jdbc.query(FIND_ALL, mapper);
     }*/
+    }
 
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
@@ -29,15 +30,20 @@ public class FilmService {
 
     public Film create(Film film) {
         List<String> genres = genreDbStorage.findAll();
-        for (int i = 0; i < film.getGenres().size(); i++) {
-            /*if (film.getGenres().get(i).getId() > genres.size()) {
-                throw new ValidationException("Жанра с id " + film.getGenres().get(i).getId() + " не существует");
-            }*/
+       // System.out.println(genres);
+        for (Genre genre: film.getGenres()) {
+            if (genre.getId() > genres.size()) {
+                throw new ValidationException("Жанра с id " + genre.getId() + " не существует");
+            }
         }
         if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
             throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
         }
-        return filmStorage.add(film);
+        Film newFilm = filmStorage.add(film);
+        if (!film.getGenres().isEmpty()) {
+            genreDbStorage.save(film);
+        }
+        return newFilm;
     }
 
     public Film update(Film film) {
@@ -45,14 +51,15 @@ public class FilmService {
             throw new NotFoundException("Фильма с id " + film.getId() + " не существует");
         }
         List<String> genres = genreDbStorage.findAll();
-        for (int i = 0; i < film.getGenres().size(); i++) {
-          /*  if (film.getGenres().get(i).getId() > genres.size()) {
-                throw new ValidationException("Жанра с id " + film.getGenres().get(i).getId() + " не существует");
-            }*/
+        for (Genre genre: film.getGenres()) {
+            if (genre.getId() > genres.size()) {
+                throw new ValidationException("Жанра с id " + genre.getId() + " не существует");
+            }
         }
         if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
             throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
         }
+        // update Genre TODO
         return filmStorage.update(film);
     }
 

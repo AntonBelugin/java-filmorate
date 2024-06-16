@@ -23,12 +23,12 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
       //  log.info("==> POST /films");
-        System.out.println();
-        System.out.println(film);
+     //  System.out.println();
+     //   System.out.println(film);
       //  System.out.println(film.getGenres());
        // System.out.println(film.getGenres().size());
        // System.out.println(film.getGenres().getFirst());
-        System.out.println();
+      //  System.out.println();
         validateService.validateFilm(film);
      //   film.setId(getNextId());
         Film newFilm = filmService.create(film);
@@ -39,10 +39,10 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         log.info("==> PUT /films");
-        System.out.println();
+      /*  System.out.println();
         System.out.println("Update");
         System.out.println();
-        System.out.println(film);
+        System.out.println(film);*/
         validateService.validateUpdateFilm(film);
         Film upFilm = filmService.update(film);
         log.info("<== PUT /films {}", upFilm);
@@ -53,7 +53,9 @@ public class FilmController {
     public Collection<Film> findAll() {
       //  log.info("<== GET /films {}", filmService.findAll());
         Collection<Film> films = filmService.findAll();
-        System.out.println(films);
+        for (Film film : films) {
+            System.out.println(film);
+        }
         return films;
     }
 
