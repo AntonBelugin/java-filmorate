@@ -36,37 +36,18 @@ public class UserController {
         validateService.validateUser(user);
         //user.setId(getNextId());
         User newUser = userService.create(user);
-        log.info("<== POST /users {}", newUser);
+       // log.info("<== POST /users {}", newUser);
         return newUser;
     }
 
     @PutMapping
     public User update(@RequestBody User user) {
-        log.info("==> PUT /films");
-        System.out.println();
-        System.out.println(user);
-        System.out.println("validate test");
-        validateService.validateUpdateUser(user);
-       // System.out.println();
-        System.out.println();
-        System.out.println(user);
-        System.out.println();
-        System.out.println("validate ok");
+       // log.info("==> PUT /films");
 
-     /*   jdbc.update(
-                UPDATE_QUERY,
-                upUser.getEmail(),
-                upUser.getLogin(),
-                upUser.getName(),
-                upUser.getBirthday(),
-                upUser.getId()
-        );*/
+        validateService.validateUpdateUser(user);
+
         User upUser = userService.update(user);
-      /*  System.out.println();
-        System.out.println(123);*/
-        System.out.println();
-        System.out.println(upUser);
-        System.out.println("posle update");
+
       //  log.info("<== PUT /users {}", upUser);
         return upUser;
     }

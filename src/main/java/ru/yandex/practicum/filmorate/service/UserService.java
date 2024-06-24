@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
-import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.mappers.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
 
@@ -14,10 +12,12 @@ import java.util.Collection;
 @Service
 public class UserService {
     private UserStorage userStorage;
+    private FriendshipDbStorage friendShip;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, FriendshipDbStorage friendShip) {
         this.userStorage = userStorage;
+        this.friendShip = friendShip;
     }
 
     public User create(User user) {
@@ -25,25 +25,7 @@ public class UserService {
     }
 
     public User update(User user) {
-       if (userStorage.findById(user.getId()).isEmpty()) {
-           System.out.println("не существует");
-           throw new NotFoundException("Пользователя с id " + user.getId() + " не существует");
-       }
-       // User updUser = UserMapper.updateUserFields(updatedUser, user);
-
-         //       .map(user -> UserMapper.updateUserFields(user, request))
-         //       .orElseThrow(() -> new NotFoundException("Пользователя с id " + request.getId() + " не существует"));
-
-        System.out.println("optional");
-        //System.out.println(updUser);
-        //User userNew = userStorage.findById(user.getId()).get();
-       // System.out.println(userNew + "userNew");
-        System.out.println();
-        System.out.println("отправка на обновление");
-        //userStorage.findById(upUser.getId());
-        System.out.println();
-
-        //userStorage.update(user);
+        testUser(user.getId());
         return userStorage.update(user);
     }
 
@@ -52,29 +34,38 @@ public class UserService {
     }
 
     public void addFriends(long userId, long friendId) {
-        userStorage.findById(userId);
-        userStorage.findById(friendId);
-        userStorage.addFriends(userId, friendId);
+        testUser(userId);
+        testUser(friendId);
+        friendShip.add(userId, friendId);
     }
 
     public void deleteFriends(long userId, long friendId) {
-        userStorage.findById(userId);
-        userStorage.findById(friendId);
-        if (userStorage.getUserFriendsIds().containsKey(userId) &&
+        testUser(userId);
+        testUser(friendId);
+       // userStorage.findById(userId);
+     //   userStorage.findById(friendId);
+     /*   if (userStorage.getUserFriendsIds().containsKey(userId) &&
                 userStorage.getUserFriendsIds().get(userId).contains(friendId)) {
             userStorage.deleteFriends(userId, friendId);
-        }
+        }*/
+        friendShip.delete(userId, friendId);
     }
 
     public Collection<User> findFriends(long userId) {
-        userStorage.findById(userId);
-        return userStorage.findFriends(userId);
+        testUser(userId);
+        return friendShip.find(userId);
     }
 
     public Collection<User> findCommonFriends(long userId, long otherId) {
-        userStorage.findById(userId);
-        userStorage.findById(otherId);
-        return userStorage.findCommonFriends(userId, otherId);
+        testUser(userId);
+        testUser(otherId);
+        return friendShip.findCommon(userId, otherId);
+    }
+
+    private void testUser(long id) {
+        if (userStorage.findById(id).isEmpty()) {
+            throw new NotFoundException("Пользователя с id " + id + " не существует");
+        }
     }
 
 }

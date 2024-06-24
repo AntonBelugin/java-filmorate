@@ -38,6 +38,9 @@ public class FilmDbStorage implements FilmStorage {
             " duration=?, mpa=? WHERE id = ?";
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM films WHERE id = ?";
     private static final String FIND_ALL = "SELECT * FROM films AS f JOIN GENRES G on f.ID = G.ID_FILM";
+    private static final String FIND_MOST_LIKE = "SELECT * FROM films AS f JOIN GENRES G on f.ID = G.ID_FILM " +
+            "WHERE id IN (SELECT id_film FROM " +
+            "(SELECT id_film, COUNT(id_film) FROM filmlikes GROUP BY id_film ORDER BY COUNT(ID_FILM) desc LIMIT ?));";
 
     @Override
     public Film add(Film film) {
@@ -52,7 +55,6 @@ public class FilmDbStorage implements FilmStorage {
             ps.setObject(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
-     //   System.out.println(keyHolder);
 
         Long id = keyHolder.getKeyAs(Long.class);
         if (id != null) {
@@ -62,12 +64,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return film;
-        /*jdbc.update(INSERT_QUERY,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId());*/
+
     }
 
     @Override
@@ -77,10 +74,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
-       /* if (!films.containsKey(upFilm.getId())) {
-            throw new ValidationException("Неверный Id");
-        }*/
-        //films.put(upFilm.getId(), upFilm);
+
         jdbc.update(UPDATE_QUERY,
                 film.getName(),
                 film.getDescription(),
@@ -94,7 +88,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        //LinkedList<Film> films = new LinkedList<>();
+
         try {
             return jdbc.query(FIND_ALL, new FilmResultSetExtractor());
         } catch (EmptyResultDataAccessException ignored) {
@@ -116,7 +110,14 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Collection<Film> mostLike(int count) {
-        HashMap<Long, Integer> filmsCountLike = new HashMap<>();
+        try {
+            return jdbc.query(FIND_MOST_LIKE, new FilmResultSetExtractor(), count);
+        } catch (EmptyResultDataAccessException ignored) {
+            return null;
+        }
+
+
+       /* HashMap<Long, Integer> filmsCountLike = new HashMap<>();
         filmLikes.forEach((key, value) -> filmsCountLike.put(key, value.size()));
 
         Map<Long, Integer> sortedMap = filmsCountLike.entrySet().stream()
@@ -137,25 +138,18 @@ public class FilmDbStorage implements FilmStorage {
         return listId.stream()
                 .limit(count)
                 .map(id -> films.get(id))
-                .toList();
+                .toList();*/
     }
 
     @Override
     public Optional<Film> findById(long filmId) {
         try {
             Film film = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, (int) filmId);
-          /*  System.out.println();
-            System.out.println(film);
-            System.out.println();
-            System.out.println("find ok");*/
+
             return Optional.ofNullable(film);
         } catch (EmptyResultDataAccessException ignored) {
-            System.out.println("catch");
-            return Optional.empty();
 
-           /* if (!films.containsKey(filmId)) {
-                throw new NotFoundException("Фильма с id " + filmId + " не существует");
-            }*/
+            return Optional.empty();
         }
     }
 
@@ -207,13 +201,11 @@ public class FilmDbStorage implements FilmStorage {
                 genre = new Genre();
                 genre.setId(rs.getInt("id_genre"));
                 film.getGenres().add(genre);
-               // filmList.add(film);
+
             }
             return filmList;
         }
-   /* public List<Film> getFilms() {
-        return jdbc.query(FIND_ALL, mapper);
-    }*/
+
     }
 
 }

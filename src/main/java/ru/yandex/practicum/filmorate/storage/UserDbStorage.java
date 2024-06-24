@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -10,9 +11,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 
@@ -24,6 +30,7 @@ public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> mapper;
     private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
     private static final String INSERT_QUERY = "INSERT INTO users (login, name, email, birthday)" +
             " VALUES (?, ?, ?, ?)";
     private static final String UPDATE_QUERY = "UPDATE users SET login=?, name=?, email=?, birthday=? WHERE id=?";
@@ -42,9 +49,6 @@ public class UserDbStorage implements UserStorage {
             return ps;
         }, keyHolder);
         Long id = keyHolder.getKeyAs(Long.class);
-        System.out.println();
-        System.out.println(id);
-        System.out.println();
         if (id != null) {
             user.setId(id);
         } else {
@@ -60,9 +64,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User update(User user) {
-        System.out.println();
-        System.out.println(user);
-        System.out.println("update");
+
         jdbc.update(
                 UPDATE_QUERY,
                 user.getLogin(),
@@ -71,26 +73,29 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday(),
                 user.getId()
         );
-        System.out.println();
-        System.out.println("update ok");
         return user;
     }
 
     @Override
     public Collection<User> findAll() {
-        return users.values();
+        try {
+            return jdbc.query(FIND_ALL_QUERY, new UserDbStorage.UserResultSetExtractor());
+        }
+        catch (EmptyResultDataAccessException ignored) {
+                return null;
+            }
     }
 
     @Override
     public void addFriends(long userId, long friendId) {
-        Set<Long> uFriends = userFriendsIds.computeIfAbsent(userId, id -> new HashSet<>());
+       /* Set<Long> uFriends = userFriendsIds.computeIfAbsent(userId, id -> new HashSet<>());
         uFriends.add(friendId);
 
         Set<Long> fFriends = userFriendsIds.computeIfAbsent(friendId, id -> new HashSet<>());
         fFriends.add(userId);
 
         userFriendsIds.put(userId, uFriends);
-        userFriendsIds.put(friendId, fFriends);
+        userFriendsIds.put(friendId, fFriends);*/
     }
 
     @Override
@@ -125,26 +130,39 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Optional<User> findById(long userId) {
-        System.out.println("find check");
+
         try {
             User user = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, (int) userId);
-            System.out.println();
-            System.out.println(user);
-            System.out.println();
-            System.out.println("find ok");
+
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException ignored) {
-            System.out.println("catch");
+
             return Optional.empty();
-          //  System.out.println("catch");
-          //  throw new NotFoundException("Пользователя с id " + userId + " не существует");
-           // return Optional.empty();
-          //  throw new NotFoundException("Пользователя с id " + userId + " не существует");
+
             }
-       /* if (jdbc.queryForObject(FIND_BY_ID_QUERY, Integer.class, userId) == 0) {
-            throw new NotFoundException("Пользователя с id " + userId + " не существует");
-        }*/
+
     }
+
+    public class UserResultSetExtractor implements ResultSetExtractor<List<User>> {
+        @Override
+        public List<User> extractData(ResultSet rs) throws SQLException {
+            LinkedList<User> userList = new LinkedList<>();
+            if (!rs.isBeforeFirst()) {
+                return userList;
+            }
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setName(rs.getString("name"));
+                user.setEmail(rs.getString("email"));
+                user.setLogin(rs.getString("login"));
+                user.setBirthday(rs.getDate("birthday").toLocalDate());
+                userList.add(user);
+            }
+            return userList;
+        }
+    }
+
 
     public Map<Long, User> getUsers() {
         return users;

@@ -23,29 +23,21 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
       //  log.info("==> POST /films");
-     //  System.out.println();
-     //   System.out.println(film);
-      //  System.out.println(film.getGenres());
-       // System.out.println(film.getGenres().size());
-       // System.out.println(film.getGenres().getFirst());
-      //  System.out.println();
+
         validateService.validateFilm(film);
-     //   film.setId(getNextId());
+
         Film newFilm = filmService.create(film);
-        log.info("<== POST /films {}", newFilm);
+       // log.info("<== POST /films {}", newFilm);
         return newFilm;
     }
 
     @PutMapping
     public Film update(@RequestBody Film film) {
-        log.info("==> PUT /films");
-      /*  System.out.println();
-        System.out.println("Update");
-        System.out.println();
-        System.out.println(film);*/
+      //  log.info("==> PUT /films");
+
         validateService.validateUpdateFilm(film);
         Film upFilm = filmService.update(film);
-        log.info("<== PUT /films {}", upFilm);
+      //  log.info("<== PUT /films {}", upFilm);
         return upFilm;
     }
 
