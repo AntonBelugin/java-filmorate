@@ -1,30 +1,18 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-
 import java.util.*;
 
+@Component
 public interface UserStorage {
 
     User save(User user);
 
-    void delete(User user);
-
-   User update(User user);
+    User update(User user);
 
     Collection<User> findAll();
-
-    void addFriends(long userId, long friendId);
-
-    void deleteFriends(long userId, long friendId);
-
-    Collection<User> findFriends(long userId);
-
-    Collection<User> findCommonFriends(long userId, long otherId);
-
-    Map<Long, User> getUsers();
-
-    HashMap<Long, Set<Long>> getUserFriendsIds();
 
     Optional<User> findById(long userId);
 }

@@ -4,23 +4,35 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
-
+import ru.yandex.practicum.filmorate.mappers.MpaResultSetExtractor;
+import ru.yandex.practicum.filmorate.mappers.MpaRowMapper;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import java.util.Collection;
 import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class MpaDbStorage {
     private final JdbcTemplate jdbc;
-    private static final String FIND_BY_ID_QUERY = "SELECT mpa FROM mpa WHERE id = ?";
+    private final MpaRowMapper mapper;
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM MPA WHERE ID = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM MPA ORDER BY ID";
 
-    public Optional<String> findById(long mpaId) {
+    public Collection<Mpa> findAll() {
         try {
-            String nameMpa = jdbc.queryForObject(FIND_BY_ID_QUERY, String.class, (int) mpaId);
-            System.out.println(nameMpa);
-            return Optional.ofNullable(nameMpa);
+            return jdbc.query(FIND_ALL_QUERY, new MpaResultSetExtractor());
+        } catch (EmptyResultDataAccessException ignored) {
+            return null;
+        }
+    }
+
+    public Optional<Mpa> findById(int id) {
+        try {
+            Mpa mpa = jdbc.queryForObject(FIND_BY_ID_QUERY, mapper, id);
+            return Optional.ofNullable(mpa);
         } catch (EmptyResultDataAccessException ignored) {
             return Optional.empty();
         }
     }
+
 }

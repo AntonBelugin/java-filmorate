@@ -12,12 +12,12 @@ import java.util.Collection;
 @Service
 public class UserService {
     private UserStorage userStorage;
-    private FriendshipDbStorage friendShip;
+    private FriendshipDbStorage friendshipDbStorage;
 
     @Autowired
     public UserService(UserStorage userStorage, FriendshipDbStorage friendShip) {
         this.userStorage = userStorage;
-        this.friendShip = friendShip;
+        this.friendshipDbStorage = friendShip;
     }
 
     public User create(User user) {
@@ -36,35 +36,38 @@ public class UserService {
     public void addFriends(long userId, long friendId) {
         testUser(userId);
         testUser(friendId);
-        friendShip.add(userId, friendId);
+        friendshipDbStorage.add(userId, friendId);
     }
 
     public void deleteFriends(long userId, long friendId) {
         testUser(userId);
         testUser(friendId);
-       // userStorage.findById(userId);
-     //   userStorage.findById(friendId);
-     /*   if (userStorage.getUserFriendsIds().containsKey(userId) &&
-                userStorage.getUserFriendsIds().get(userId).contains(friendId)) {
-            userStorage.deleteFriends(userId, friendId);
-        }*/
-        friendShip.delete(userId, friendId);
+        friendshipDbStorage.delete(userId, friendId);
     }
 
     public Collection<User> findFriends(long userId) {
         testUser(userId);
-        return friendShip.find(userId);
+        return friendshipDbStorage.find(userId);
     }
 
     public Collection<User> findCommonFriends(long userId, long otherId) {
         testUser(userId);
         testUser(otherId);
-        return friendShip.findCommon(userId, otherId);
+        return friendshipDbStorage.findCommon(userId, otherId);
     }
 
     private void testUser(long id) {
         if (userStorage.findById(id).isEmpty()) {
             throw new NotFoundException("Пользователя с id " + id + " не существует");
+        }
+    }
+
+    public User findById(long id) {
+        testUser(id);
+        if (userStorage.findById(id).isPresent()) {
+            return userStorage.findById(id).get();
+        } else {
+            throw new NotFoundException("Пользователь с id " + id + " не найден");
         }
     }
 

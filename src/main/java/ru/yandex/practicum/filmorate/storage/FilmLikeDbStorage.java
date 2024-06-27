@@ -8,14 +8,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FilmLikeDbStorage {
     private final JdbcTemplate jdbc;
-    private static final String INSERT_QUERY = "INSERT INTO filmlikes (id_film, id_user) " +
-            " VALUES (?, ?) ";
-    private static final String DELETE_QUERY = "DELETE FROM filmlikes WHERE id_film = ? AND id_user = ?";
-
+    private static final String INSERT_QUERY = "INSERT INTO FILMLIKES (ID_FILM, ID_USER) SELECT ?, ? " +
+            "WHERE NOT EXISTS(SELECT * FROM FILMLIKES WHERE ID_FILM = ? AND ID_USER = ?)";
+    private static final String DELETE_QUERY = "DELETE FROM FILMLIKES WHERE ID_FILM = ? AND ID_USER = ?";
 
     public void add(long filmId, long userId) {
         jdbc.update(
                 INSERT_QUERY,
+                filmId,
+                userId,
                 filmId,
                 userId
         );

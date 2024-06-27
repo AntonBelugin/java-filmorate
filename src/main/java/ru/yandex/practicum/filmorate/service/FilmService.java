@@ -1,44 +1,28 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.*;
-
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 
 @Service
+@RequiredArgsConstructor
 public class FilmService {
     private final MpaDbStorage mpaDbStorage;
     private final GenreDbStorage genreDbStorage;
     private final FilmLikeDbStorage filmLikeDbStorage;
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage, MpaDbStorage mpaDbStorage, GenreDbStorage genreDbStorage, FilmLikeDbStorage filmLikeDbStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.mpaDbStorage = mpaDbStorage;
-        this.genreDbStorage = genreDbStorage;
-        this.filmLikeDbStorage = filmLikeDbStorage;
-    }
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Film create(Film film) {
-        List<String> genres = genreDbStorage.findAll();
-
-        for (Genre genre: film.getGenres()) {
-            if (genre.getId() > genres.size()) {
-                throw new ValidationException("Жанра с id " + genre.getId() + " не существует");
-            }
-        }
-        if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
-            throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
-        }
+        testGenre(film.getGenres());
+        testMpa(film.getMpa());
         Film newFilm = filmStorage.add(film);
         if (!film.getGenres().isEmpty()) {
             genreDbStorage.save(film);
@@ -47,18 +31,12 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        test(film.getId());
-
-        List<String> genres = genreDbStorage.findAll();
-        for (Genre genre: film.getGenres()) {
-            if (genre.getId() > genres.size()) {
-                throw new ValidationException("Жанра с id " + genre.getId() + " не существует");
-            }
+        testFilm(film.getId());
+        testGenre(film.getGenres());
+        testMpa(film.getMpa());
+        if (!film.getGenres().isEmpty()) {
+            genreDbStorage.save(film);
         }
-        if (mpaDbStorage.findById(film.getMpa().getId()).isEmpty()) {
-            throw new ValidationException("Рейтинга с id " + film.getMpa().getId() + " не существует");
-        }
-        // update Genre TODO
         return filmStorage.update(film);
     }
 
@@ -66,15 +44,24 @@ public class FilmService {
         return filmStorage.getAll();
     }
 
+    public Film findById(long id) {
+        testFilm(id);
+        if (filmStorage.findById(id).isPresent()) {
+            return filmStorage.findById(id).get();
+        } else {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
+    }
+
     public void addLike(long id, long userId) {
         testUser(userId);
-        test(id);
+        testFilm(id);
         filmLikeDbStorage.add(id, userId);
     }
 
     public void deleteLike(long id, long userId) {
         testUser(userId);
-        test(id);
+        testFilm(id);
         filmLikeDbStorage.delete(id, userId);
     }
 
@@ -82,7 +69,7 @@ public class FilmService {
         return filmStorage.mostLike(count);
     }
 
-    public void test(long id) {
+    public void testFilm(long id) {
         if (filmStorage.findById(id).isEmpty()) {
             throw new NotFoundException("Фильма с id " + id + " не существует");
         }
@@ -91,6 +78,21 @@ public class FilmService {
     private void testUser(long id) {
         if (userStorage.findById(id).isEmpty()) {
             throw new NotFoundException("Пользователя с id " + id + " не существует");
+        }
+    }
+
+    private void testGenre(HashSet<Genre> genres) {
+        for (Genre genre: genres) {
+            if (genre.getId() > genreDbStorage.findAll().size()) {
+                throw new ValidationException("Жанра с id " + genre.getId() + " не существует");
+            }
+        }
+    }
+
+    private void testMpa(Mpa mpa) {
+        if (mpa.getId() > mpaDbStorage.findAll().size()) {
+            System.out.println(mpaDbStorage.findAll().size());
+            throw new ValidationException("Рейтинга с id " + mpa.getId() + " не существует");
         }
     }
 
