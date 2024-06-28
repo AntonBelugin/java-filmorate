@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class MpaService {
@@ -21,12 +22,9 @@ public class MpaService {
     }
 
     public Mpa getById(int id) {
-        Collection<Mpa> mpa = mpaDbStorage.findAll();
-        if (id > mpa.size()) {
-            throw new NotFoundException("Рейтинга с id " + id + " не существует");
-        }
-        if (mpaDbStorage.findById(id).isPresent()) {
-            return mpaDbStorage.findById(id).get();
+        Optional<Mpa> optionalMpa = mpaDbStorage.findById(id);
+        if (optionalMpa.isPresent()) {
+            return optionalMpa.get();
         } else {
             throw new NotFoundException("Рейтинг с id " + id + " не найден");
         }

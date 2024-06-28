@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.Collection;
+import java.util.Optional;
 
 
 @Service
@@ -14,7 +15,7 @@ public class UserService {
     private UserStorage userStorage;
     private FriendshipDbStorage friendshipDbStorage;
 
-    @Autowired
+   @Autowired
     public UserService(UserStorage userStorage, FriendshipDbStorage friendShip) {
         this.userStorage = userStorage;
         this.friendshipDbStorage = friendShip;
@@ -63,9 +64,9 @@ public class UserService {
     }
 
     public User findById(long id) {
-        testUser(id);
-        if (userStorage.findById(id).isPresent()) {
-            return userStorage.findById(id).get();
+       Optional<User> user = userStorage.findById(id);
+        if (user.isPresent()) {
+            return user.get();
         } else {
             throw new NotFoundException("Пользователь с id " + id + " не найден");
         }

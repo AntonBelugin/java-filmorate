@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +46,9 @@ public class FilmService {
     }
 
     public Film findById(long id) {
-        testFilm(id);
-        if (filmStorage.findById(id).isPresent()) {
-            return filmStorage.findById(id).get();
+        Optional<Film> filmOptional = filmStorage.findById(id);
+        if (filmOptional.isPresent()) {
+            return filmOptional.get();
         } else {
             throw new NotFoundException("Фильм с id " + id + " не найден");
         }

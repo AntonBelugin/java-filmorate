@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.mappers.UserResultSetExtractor;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,16 +14,16 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.*;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbc;
     private final RowMapper<User> mapper;
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM users WHERE id = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM users";
-    private static final String INSERT_QUERY = "INSERT INTO users (login, name, email, birthday)" +
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM USERS WHERE ID = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM USERS";
+    private static final String INSERT_QUERY = "INSERT INTO USERS (LOGIN, NAME, EMAIL, BIRTHDAY)" +
             " VALUES (?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE users SET login=?, name=?, email=?, birthday=? WHERE id=?";
+    private static final String UPDATE_QUERY = "UPDATE USERS SET LOGIN=?, NAME=?, EMAIL=?, BIRTHDAY=? WHERE ID=?";
 
     @Override
     public User save(User user) {

@@ -3,14 +3,14 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mappers.MpaResultSetExtractor;
 import ru.yandex.practicum.filmorate.mappers.MpaRowMapper;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import java.util.Collection;
 import java.util.Optional;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class MpaDbStorage {
     private final JdbcTemplate jdbc;
