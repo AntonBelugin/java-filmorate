@@ -40,8 +40,7 @@ public class FriendshipDbStorage {
     public List<User> find(long userId) {
         try {
             return jdbc.query(FIND_QUERY, new UserResultSetExtractor(), userId);
-        }
-        catch (EmptyResultDataAccessException ignored) {
+        } catch (EmptyResultDataAccessException ignored) {
             return null;
         }
     }
@@ -49,8 +48,7 @@ public class FriendshipDbStorage {
     public List<User> findCommon(long userId, long otherId) {
         try {
             return jdbc.query(FIND_COMMON_QUERY, new UserResultSetExtractor(), userId, otherId);
-        }
-        catch (EmptyResultDataAccessException ignored) {
+        } catch (EmptyResultDataAccessException ignored) {
             return null;
         }
     }

@@ -63,8 +63,7 @@ public class UserDbStorage implements UserStorage {
     public Collection<User> findAll() {
         try {
             return jdbc.query(FIND_ALL_QUERY, new UserResultSetExtractor());
-        }
-        catch (EmptyResultDataAccessException ignored) {
+        } catch (EmptyResultDataAccessException ignored) {
                 return null;
             }
     }
