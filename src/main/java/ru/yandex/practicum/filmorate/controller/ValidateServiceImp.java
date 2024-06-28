@@ -11,12 +11,15 @@ public class ValidateServiceImp implements ValidateService {
     @Override
     public void validateUser(User user) {
         if (user.getEmail() == null || !user.getEmail().contains("@")) {
+            System.out.println("Неправильный Имейл");
             throw new ValidationException("Неправильный Имейл");
         }
         if (user.getLogin() == null || user.getLogin().contains(" ")) {
+            System.out.println("Неправильный Логин");
             throw new ValidationException("Неправильный Логин");
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
+            System.out.println("Неправильно указана дата рождения");
             throw new ValidationException("Неправильно указана дата рождения");
         }
         if (user.getName() == null || user.getName().isEmpty()) {
@@ -25,11 +28,11 @@ public class ValidateServiceImp implements ValidateService {
     }
 
     @Override
-    public void validateUpdateUser(User upUser) {
-        if (upUser.getId() == null) {
+    public void validateUpdateUser(User user) {
+        if (user.getId() == null) {
             throw new ValidationException("Id должен быть указан");
         }
-        validateUser(upUser);
+       validateUser(user);
     }
 
     @Override
