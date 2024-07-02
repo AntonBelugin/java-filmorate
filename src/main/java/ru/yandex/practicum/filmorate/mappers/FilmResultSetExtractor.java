@@ -53,6 +53,7 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
     }
 
     private void setFilm(Film film, ResultSet rs) throws SQLException {
+        film.setId(rs.getLong("id"));
         film.setName(rs.getString("name"));
         film.setDescription(rs.getString("description"));
         film.setReleaseDate(rs.getDate("releasedate").toLocalDate());

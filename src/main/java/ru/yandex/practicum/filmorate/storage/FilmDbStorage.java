@@ -17,17 +17,17 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
-    private static final String INSERT_QUERY = "INSERT INTO FILMS (NAME, DESCRIPTION, RELEASEDATE, DURATION, MPA_ID)" +
+    private static final String INSERT_QUERY = "INSERT INTO films (name, description, releasedate, duration, mpa_id)" +
             " VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE FILMS SET NAME=?, DESCRIPTION=?, RELEASEDATE=?," +
+    private static final String UPDATE_QUERY = "UPDATE films SET name=?, DESCRIPTION=?, RELEASEDATE=?," +
             " DURATION=?, MPA_ID=? WHERE ID = ?";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM FILMS AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM films AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
             "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID WHERE F.ID = ?";
-    private static final String FIND_ALL = "SELECT * FROM FILMS AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
+    private static final String FIND_ALL = "SELECT * FROM films AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
             "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID ORDER BY F.ID ";
     private static final String FIND_MOST_LIKE = "SELECT * FROM (SELECT ID_FILM, count(ID_FILM) FROM FILMLIKES " +
             "GROUP BY ID_FILM ORDER BY count(ID_FILM) desc LIMIT ?) AS FL " +
-            "LEFT JOIN FILMS F ON FL.ID_FILM = F.ID LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
+            "LEFT JOIN films F ON FL.ID_FILM = F.ID LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
             "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID";
 
     @Override

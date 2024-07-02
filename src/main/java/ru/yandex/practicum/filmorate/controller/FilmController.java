@@ -21,8 +21,6 @@ public class FilmController {
 
     @PostMapping
     public Film create(@RequestBody Film film) {
-        log.info("==> POST /films");
-        validateService.validateFilm(film);
         Film newFilm = filmService.create(film);
         log.info("<== POST /films {}", newFilm);
         return newFilm;
@@ -31,7 +29,6 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film film) {
         log.info("==> PUT /films");
-        validateService.validateUpdateFilm(film);
         Film updatedFilm = filmService.update(film);
         log.info("<== PUT /films {}", updatedFilm);
         return updatedFilm;
@@ -39,14 +36,14 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        log.info("<== GET /films {}", filmService.findAll());
         return filmService.findAll();
     }
 
     @GetMapping("/{id}")
     public Film findById(@PathVariable long id) {
-         log.info("==> PUT /films/{id}");
-        return filmService.findById(id);
+        Film film = filmService.findById(id);
+        log.info("<== GET /films {}", film);
+        return film;
     }
 
     @PutMapping("/{id}/like/{userId}")

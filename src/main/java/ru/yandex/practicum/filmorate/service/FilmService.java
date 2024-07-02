@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.controller.ValidateService;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -20,10 +21,10 @@ public class FilmService {
     private final FilmLikeDbStorage filmLikeDbStorage;
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final ValidateService validateService;
 
     public Film create(Film film) {
-        testGenre(film.getGenres());
-        testMpa(film.getMpa());
+        testFilm(film);
         Film newFilm = filmStorage.add(film);
         if (!film.getGenres().isEmpty()) {
             genreDbStorage.save(film);
@@ -32,9 +33,8 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        testFilm(film.getId());
-        testGenre(film.getGenres());
-        testMpa(film.getMpa());
+        checkFilm(film.getId());
+        testFilm(film);
         if (!film.getGenres().isEmpty()) {
             genreDbStorage.save(film);
         }
@@ -56,13 +56,13 @@ public class FilmService {
 
     public void addLike(long id, long userId) {
         testUser(userId);
-        testFilm(id);
+        checkFilm(id);
         filmLikeDbStorage.add(id, userId);
     }
 
     public void deleteLike(long id, long userId) {
         testUser(userId);
-        testFilm(id);
+        checkFilm(id);
         filmLikeDbStorage.delete(id, userId);
     }
 
@@ -70,10 +70,16 @@ public class FilmService {
         return filmStorage.mostLike(count);
     }
 
-    public void testFilm(long id) {
+    public void checkFilm(long id) {
         if (filmStorage.findById(id).isEmpty()) {
             throw new NotFoundException("Фильма с id " + id + " не существует");
         }
+    }
+
+    public void testFilm(Film film) {
+        validateService.validateFilm(film);
+        testGenre(film.getGenres());
+        testMpa(film.getMpa());
     }
 
     private void testUser(long id) {

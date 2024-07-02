@@ -22,7 +22,7 @@ public class UserController {
         log.info("==> POST /users");
         validateService.validateUser(user);
         User newUser = userService.create(user);
-        log.info("<== POST /users {}", newUser);
+        log.info("<== POST /users {}", newUser.getId() + newUser.getName());
         return newUser;
     }
 
@@ -31,7 +31,7 @@ public class UserController {
         log.info("==> PUT /users");
         validateService.validateUpdateUser(user);
         User upUser = userService.update(user);
-        log.info("<== PUT /users {}", upUser);
+        log.info("<== PUT /users {}", upUser.getId() + upUser.getName());
         return upUser;
     }
 

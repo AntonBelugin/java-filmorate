@@ -12,5 +12,4 @@ public interface ValidateService {
 
     void validateFilm(Film film);
 
-    void validateUpdateFilm(Film film);
 }
