@@ -41,11 +41,11 @@ class FilmDbStorageTests {
         user.setLogin("login");
         user.setName("name");
         user.setEmail("email@email.com");
-        user.setBirthday(LocalDate.ofEpochDay(1975-5-12));
+        user.setBirthday(LocalDate.ofEpochDay(1975 - 5 - 12));
         film.setName("name");
         film.setDescription("description");
         film.setDuration(60);
-        film.setReleaseDate(LocalDate.ofEpochDay(1990-12-12));
+        film.setReleaseDate(LocalDate.ofEpochDay(1990 - 12 - 12));
         Mpa mpa = new Mpa();
         mpa.setId(1);
         film.setMpa(mpa);

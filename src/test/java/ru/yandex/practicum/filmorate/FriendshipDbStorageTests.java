@@ -31,7 +31,7 @@ class FriendshipDbStorageTests {
         user.setLogin("login");
         user.setName("name");
         user.setEmail("email@email.com");
-        user.setBirthday(LocalDate.ofEpochDay(1975-5-12));
+        user.setBirthday(LocalDate.ofEpochDay(1975 - 5 - 12));
         userDbStorage.save(user);
         userDbStorage.save(user);
     }
