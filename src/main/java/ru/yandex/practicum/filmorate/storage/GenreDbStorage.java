@@ -16,10 +16,10 @@ import java.util.*;
 public class GenreDbStorage {
     private final JdbcTemplate jdbc;
     private final GenreRowMapper mapper;
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM GENRE WHERE ID = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM GENRE ORDER BY ID";
-    private static final String INSERT_QUERY_GENRE = "INSERT INTO GENRES (ID_FILM, ID_GENRE) SELECT ?, ? " +
-            "WHERE NOT EXISTS(SELECT * FROM GENRES WHERE ID_FILM = ? AND ID_GENRE = ?)";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM genre WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM genre ORDER BY id";
+    private static final String INSERT_QUERY_GENRE = "INSERT INTO genres (id_film, id_genre) SELECT ?, ? " +
+            " WHERE NOT EXISTS(SELECT * FROM genres WHERE id_film = ? AND id_genre = ?)";
 
     public Collection<Genre> findAll() {
         try {
@@ -39,14 +39,13 @@ public class GenreDbStorage {
     }
 
     public void save(Film film) {
-        for (Genre genre: film.getGenres()) {
-            jdbc.update(INSERT_QUERY_GENRE,
-                    film.getId(),
-                    genre.getId(),
-                    film.getId(),
-                    genre.getId()
-            );
+        List<Object[]> batch = new ArrayList<>();
+        for (Genre genre : film.getGenres()) {
+            Object[] values = new Object[] {
+                    film.getId(), genre.getId(), film.getId(), genre.getId()};
+            batch.add(values);
         }
+        jdbc.batchUpdate(INSERT_QUERY_GENRE, batch);
     }
 
 }

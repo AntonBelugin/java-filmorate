@@ -22,7 +22,7 @@ public class UserController {
         log.info("==> POST /users");
         validateService.validateUser(user);
         User newUser = userService.create(user);
-        log.info("<== POST /users {}", newUser.getId() + newUser.getName());
+        log.info("<== POST /users {}{}", newUser.getId(), newUser.getName());
         return newUser;
     }
 
@@ -31,7 +31,7 @@ public class UserController {
         log.info("==> PUT /users");
         validateService.validateUpdateUser(user);
         User upUser = userService.update(user);
-        log.info("<== PUT /users {}", upUser.getId() + upUser.getName());
+        log.info("<== PUT /users {}{}", upUser.getId(), upUser.getName());
         return upUser;
     }
 
@@ -62,8 +62,10 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User findById(@PathVariable long id) {
-        log.info("==> PUT /users/{id}");
-        return userService.findById(id);
+        log.info("==> GET /users/{id}");
+        User user = userService.findById(id);
+        log.info("<== PUT /users/{}", user.getName());
+        return user;
     }
 
 }

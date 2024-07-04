@@ -1,17 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FriendshipDbStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.interfaces.UserStorage;
 import java.util.Collection;
 import java.util.Optional;
 
 
 @Service
 public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     private UserStorage userStorage;
     private FriendshipDbStorage friendshipDbStorage;
 
@@ -68,6 +71,7 @@ public class UserService {
         if (user.isPresent()) {
             return user.get();
         } else {
+            log.warn("Пользователь с id {} не найден", id);
             throw new NotFoundException("Пользователь с id " + id + " не найден");
         }
     }

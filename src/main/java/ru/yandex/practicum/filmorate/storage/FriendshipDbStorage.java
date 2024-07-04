@@ -12,14 +12,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FriendshipDbStorage {
     private final JdbcTemplate jdbc;
-    private static final String INSERT_QUERY = "INSERT INTO FRIENDS (USER_ID, FRIEND_ID)" +
+    private static final String INSERT_QUERY = "INSERT INTO friends (user_id, friend_id)" +
             " VALUES (?, ?)";
-    private static final String DELETE_QUERY = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-    private static final String FIND_QUERY = "SELECT * FROM USERS WHERE ID IN " +
-            "(SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?)";
-    private static final String FIND_COMMON_QUERY = "SELECT * FROM USERS WHERE ID IN " +
-            "(SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? AND " +
-            "FRIEND_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?))";
+    private static final String DELETE_QUERY = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
+    private static final String FIND_QUERY = "SELECT * FROM users WHERE id IN " +
+            "(SELECT friend_id FROM friends WHERE user_id = ?)";
+    private static final String FIND_COMMON_QUERY = "SELECT * FROM users WHERE id IN " +
+            "(SELECT friend_id FROM friends WHERE user_id = ? AND " +
+            "friend_id IN (SELECT friend_id FROM friends WHERE user_id = ?))";
 
     public void add(long userId, long friendId) {
         jdbc.update(

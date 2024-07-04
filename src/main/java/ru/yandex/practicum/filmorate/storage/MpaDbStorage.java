@@ -15,8 +15,8 @@ import java.util.Optional;
 public class MpaDbStorage {
     private final JdbcTemplate jdbc;
     private final MpaRowMapper mapper;
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM MPA WHERE ID = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM MPA ORDER BY ID";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM mpa WHERE id = ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM mpa ORDER BY id";
 
     public Collection<Mpa> findAll() {
         try {

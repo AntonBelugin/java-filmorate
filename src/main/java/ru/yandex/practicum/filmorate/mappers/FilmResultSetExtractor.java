@@ -28,9 +28,7 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
         film.setId(filmId);
         setFilm(film, rs);
         LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-        if (rs.getInt("id_genre") != 0) {
-            setGenre(film, genres, rs);
-        }
+        setGenre(film, genres, rs);
         filmList.add(film);
         while (rs.next()) {
             filmId = rs.getLong("id");
@@ -40,9 +38,7 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
                 film.setId(filmId);
                 setFilm(film, rs);
                 genres = new LinkedHashSet<>();
-                if (rs.getInt("id_genre") != 0) {
-                    setGenre(film, genres, rs);
-                }
+                setGenre(film, genres, rs);
                 filmList.add(film);
             }
             filmList.remove(film);
@@ -65,10 +61,12 @@ public class FilmResultSetExtractor implements ResultSetExtractor<List<Film>> {
     }
 
     private void setGenre(Film film, LinkedHashSet<Genre> genres, ResultSet rs) throws SQLException {
-        Genre genre = new Genre();
-        genre.setId(rs.getInt("id_genre"));
-        genre.setName(rs.getString("genre"));
-        genres.add(genre);
-        film.setGenres(genres);
+        if (rs.getInt("id_genre") != 0) {
+            Genre genre = new Genre();
+            genre.setId(rs.getInt("id_genre"));
+            genre.setName(rs.getString("genre"));
+            genres.add(genre);
+            film.setGenres(genres);
+        }
     }
 }

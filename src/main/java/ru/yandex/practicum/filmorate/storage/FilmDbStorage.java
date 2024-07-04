@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
+import ru.yandex.practicum.filmorate.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.mappers.FilmResultSetExtractor;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.sql.PreparedStatement;
@@ -19,16 +20,16 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbc;
     private static final String INSERT_QUERY = "INSERT INTO films (name, description, releasedate, duration, mpa_id)" +
             " VALUES (?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE films SET name=?, DESCRIPTION=?, RELEASEDATE=?," +
-            " DURATION=?, MPA_ID=? WHERE ID = ?";
-    private static final String FIND_BY_ID_QUERY = "SELECT * FROM films AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
-            "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID WHERE F.ID = ?";
-    private static final String FIND_ALL = "SELECT * FROM films AS F LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
-            "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID ORDER BY F.ID ";
-    private static final String FIND_MOST_LIKE = "SELECT * FROM (SELECT ID_FILM, count(ID_FILM) FROM FILMLIKES " +
-            "GROUP BY ID_FILM ORDER BY count(ID_FILM) desc LIMIT ?) AS FL " +
-            "LEFT JOIN films F ON FL.ID_FILM = F.ID LEFT JOIN GENRES G on F.ID = G.ID_FILM " +
-            "LEFT JOIN GENRE GN on G.ID_GENRE = GN.ID LEFT JOIN MPA M on F.MPA_ID = M.ID";
+    private static final String UPDATE_QUERY = "UPDATE films SET name=?, description=?, releasedate=?," +
+            " duration=?, mpa_id=? WHERE id = ?";
+    private static final String FIND_BY_ID_QUERY = "SELECT * FROM films AS f LEFT JOIN genres g on f.id = g.id_film " +
+            "LEFT JOIN genre gn on g.id_genre = gn.id LEFT JOIN mpa m on f.mpa_id = m.id WHERE f.id = ?";
+    private static final String FIND_ALL = "SELECT * FROM films AS f LEFT JOIN genres g on f.id = g.id_film " +
+            "LEFT JOIN genre gn on g.id_genre = gn.id LEFT JOIN mpa m on f.mpa_id = m.id ORDER BY f.id ";
+    private static final String FIND_MOST_LIKE = "SELECT * FROM (SELECT id_film, count(id_film) FROM filmlikes " +
+            "GROUP BY id_film ORDER BY count(id_film) desc LIMIT ?) AS fl " +
+            "LEFT JOIN films f ON fl.id_film = f.id LEFT JOIN genres g on f.id = g.id_film " +
+            "LEFT JOIN genre gn on g.id_genre = gn.id LEFT JOIN mpa m on f.mpa_id = m.id";
 
     @Override
     public Film add(Film film) {
