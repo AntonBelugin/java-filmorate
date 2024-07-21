@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+/*package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +13,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.interfaces.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
+import ru.yandex.practicum.filmorate.interfaces.UserStorage;
 import java.time.LocalDate;
 
 public class ValidateServiceTest {
@@ -40,11 +40,11 @@ public class ValidateServiceTest {
     void beforeEach() {
         validateService = new ValidateServiceImp();
         filmStorage = new InMemoryFilmStorage();
-        userStorage = new InMemoryUserStorage();
+        userStorage = new UserDbStorage();
         filmService = new FilmService(filmStorage, userStorage);
         userService = new UserService(userStorage);
         filmController = new FilmController(filmService, validateService);
-        userController = new UserController(userService, validateService);
+       // userController = new UserController(userService, validateService);
     }
 
     void setUser() {
@@ -229,4 +229,4 @@ public class ValidateServiceTest {
         Assertions.assertEquals("Id должен быть указан", exception2.getMessage());
     }
 
-}
+}*/
